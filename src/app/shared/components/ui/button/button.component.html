@@ -1,0 +1,27 @@
+<button
+  [type]="type()"
+  [disabled]="disabled()"
+  [className]="buttonClasses()"
+  (click)="onClick($event)"
+>
+  <!-- Efecto de fondo degradado (Desactivado si está disabled) -->
+  @if (!disabled()) {
+    <div [className]="gradientClasses()"></div>
+  }
+
+  <!-- Contenedor del contenido -->
+  <span class="relative flex items-center justify-center gap-2">
+    <!-- 1. Icono Izquierda (Se renderiza si la posición es 'left') -->
+    @if (iconPosition() === "left") {
+      <ng-content select="svg"></ng-content>
+    }
+
+    <!-- 2. Texto del botón -->
+    <ng-content></ng-content>
+
+    <!-- 3. Icono Derecha (Se renderiza si la posición es 'right') -->
+    @if (iconPosition() === "right") {
+      <ng-content select="svg"></ng-content>
+    }
+  </span>
+</button>

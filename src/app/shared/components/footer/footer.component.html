@@ -1,0 +1,64 @@
+<footer class="w-full border-t border-zinc-900 bg-zinc-950 py-6">
+  <div
+    class="mx-auto flex w-full flex-col items-center justify-between gap-4 px-6 sm:flex-row"
+  >
+    <!-- Lado Izquierdo: Copyright e Identidad -->
+    <div class="flex flex-col items-center gap-1 sm:items-start">
+      <span class="text-xs text-zinc-500">
+        &copy; {{ currentYear }}
+        <span class="font-semibold text-zinc-300"
+          >VALKYRIE<span class="text-purple-500">.io</span></span
+        >. Todos los derechos reservados.
+      </span>
+      <span
+        class="text-[10px] font-mono tracking-widest text-zinc-600 uppercase"
+      >
+        Enterprise Backoffice v1.0.0
+      </span>
+    </div>
+
+    <!-- Lado Derecho: Firma del Desarrollador (Cabuweb) -->
+    <div class="flex items-center gap-2 text-xs text-zinc-400">
+      <span class="text-zinc-500">Diseñado y desarrollado por</span>
+      <a
+        href="https://cabuweb.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group relative flex items-center gap-1.5 rounded-md px-2.5 py-1 font-mono text-xs font-semibold text-zinc-200 transition-all duration-350 hover:text-white hover:bg-purple-500/5 border border-zinc-800/50 hover:border-purple-500/30"
+      >
+        <!-- Indicador de estado activo morado (Lujo) -->
+        <span class="relative flex h-1.5 w-1.5">
+          <span
+            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"
+          ></span>
+          <span
+            class="relative inline-flex rounded-full h-1.5 w-1.5 bg-purple-500"
+          ></span>
+        </span>
+
+        <span
+          class="tracking-wide transition-all group-hover:drop-shadow-[0_0_8px_rgba(139,92,246,0.6)]"
+        >
+          cabuweb<span class="text-purple-500 group-hover:text-purple-400"
+            >.com</span
+          >
+        </span>
+
+        <!-- Icono minimalista de enlace externo -->
+        <svg
+          class="h-3 w-3 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-purple-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+          />
+        </svg>
+      </a>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,79 @@
+/**
+ * Strict typing options representing permissible storage keys.
+ * Guards against spelling inaccuracies or inconsistent keys in local state lookups.
+ */
+export type StorageKey = 'access_token' | 'refresh_token';
+
+/**
+ * Static client-side utility wrapper for local storage transactions.
+ * Automates data serialization, parsing, error handling, and type assertions.
+ */
+export class StorageService {
+
+  /**
+   * Persists data under the specified key in browser localStorage.
+   * Auto-serializes objects, arrays, and primitives.
+   * 
+   * @param key - The designated storage key.
+   * @param value - The data payload to stringify and store.
+   */
+  static set<T>(key: StorageKey, value: T): void {
+    try {
+      const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
+      localStorage.setItem(key, serializedValue);
+    } catch (error) {
+      console.error(`❌ Error serializando/guardando la llave [${key}] en LocalStorage:`, error);
+    }
+  }
+
+  /**
+   * Retrieves, parses, and types a record from local storage.
+   * 
+   * @template T - The expected output type.
+   * @param key - The designated storage key.
+   * @returns The parsed instance of type T, the plain string value, or null if key does not exist.
+   */
+  static get<T>(key: StorageKey): T | null {
+    try {
+      const value = localStorage.getItem(key);
+      if (!value) return null;
+
+      // Intentamos parsear por si es un objeto/array JSON o un booleano/número serializado
+      // Si falla, significa que era un string plano válido.
+      try {
+        return JSON.parse(value) as T;
+      } catch {
+        return value as unknown as T;
+      }
+    } catch (error) {
+      console.error(`❌ Error leyendo/parseando la llave [${key}] desde LocalStorage:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Deletes a record associated with the designated key.
+   * 
+   * @param key - The designated storage key.
+   */
+  static remove(key: StorageKey): void {
+    localStorage.removeItem(key);
+  }
+
+  /**
+   * Queries if a key exists in localStorage.
+   * 
+   * @param key - The designated storage key.
+   * @returns True if key exists, false otherwise.
+   */
+  static has(key: StorageKey): boolean {
+    return localStorage.getItem(key) !== null;
+  }
+
+  /**
+   * Purges all keys from the origin's local storage.
+   */
+  static clear(): void {
+    localStorage.clear();
+  }
+}

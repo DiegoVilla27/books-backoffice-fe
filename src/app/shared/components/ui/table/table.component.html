@@ -1,0 +1,104 @@
+<div
+  class="overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-950/30 backdrop-blur-sm mt-4"
+>
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse text-left text-sm">
+      <thead>
+        <tr
+          class="border-b border-zinc-900 bg-zinc-950/50 font-mono text-[10px] uppercase tracking-widest text-zinc-500"
+        >
+          @for (col of columns(); track col.key) {
+            <th
+              [className]="'px-6 py-4 font-semibold ' + (col.className || '')"
+            >
+              {{ col.label }}
+            </th>
+          }
+          @if (actionsTemplate()) {
+            <th class="px-6 py-4 font-semibold text-right">Acciones</th>
+          }
+        </tr>
+      </thead>
+
+      <!-- 🚀 Quitamos el @if drástico de aquí para mantener el DOM estable -->
+      <tbody class="divide-y divide-zinc-900/60 bg-transparent relative">
+        <!-- 🧠 CASO 1: Está cargando y es la PRIMERA carga (la tabla está vacía) -->
+        @if (loading() && data().length === 0) {
+          @for (
+            placeholder of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            track placeholder
+          ) {
+            <tr class="animate-pulse bg-transparent">
+              @for (col of columns(); track col.key) {
+                <td class="px-6 py-4">
+                  <div class="h-4 bg-zinc-800/40 rounded-md w-3/4"></div>
+                </td>
+              }
+              @if (actionsTemplate()) {
+                <td class="px-6 py-4 text-right">
+                  <div class="h-8 bg-zinc-800/40 rounded-xl w-20 ml-auto"></div>
+                </td>
+              }
+            </tr>
+          }
+        } @else {
+          <!-- 🧠 CASO 2: Hay datos (o venimos de un refresco rápido) -->
+          @for (item of data(); track item.id) {
+            <tr
+              [class.opacity-40]="loading()"
+              [class.pointer-events-none]="loading()"
+              class="group hover:bg-zinc-900/10 transition-opacity duration-200"
+            >
+              @for (col of columns(); track col.key) {
+                <td [className]="'px-6 py-4 ' + (col.className || '')">
+                  @if (cellTemplates()[col.key]) {
+                    <ng-container
+                      *ngTemplateOutlet="
+                        cellTemplates()[col.key];
+                        context: { $implicit: item }
+                      "
+                    ></ng-container>
+                  } @else {
+                    <span class="text-zinc-300">
+                      {{ getNestedValue(item, col.key) }}
+                    </span>
+                  }
+                </td>
+              }
+
+              @if (actionsTemplate()) {
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <ng-container
+                      *ngTemplateOutlet="
+                        actionsTemplate();
+                        context: { $implicit: item }
+                      "
+                    ></ng-container>
+                  </div>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <!-- Solo se muestra si de verdad terminó de cargar y no hay nada -->
+            @if (!loading()) {
+              <app-no-results
+                [entity]="entity()"
+                [colspan]="totalColumnsCount()"
+                class="contents"
+              />
+            }
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [currentPage]="page()"
+    [itemsPerPage]="limit()"
+    [totalItems]="totalItems()"
+    [totalPages]="totalPages()"
+    (pageChanged)="pageChanged.emit($event)"
+  />
+</div>

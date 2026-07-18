@@ -1,0 +1,75 @@
+<div
+  class="flex items-center justify-between border-t border-zinc-900 bg-zinc-950/40 px-6 py-4 flex-col md:flex-row gap-4"
+>
+  <!-- Contador Computado -->
+  <div class="text-xs text-zinc-500 font-mono">
+    Mostrando del
+    <span class="text-zinc-300">{{ fromItem() }}</span> al
+    <span class="text-zinc-300">{{ toItem() }}</span> de
+    <span class="text-zinc-300">{{ totalItems() }}</span> registros
+  </div>
+
+  <div class="flex items-center gap-1.5">
+    <!-- Anterior -->
+    <button
+      (click)="prev()"
+      [disabled]="currentPage() === 1"
+      class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 bg-zinc-950 text-zinc-400 hover:text-purple-400 hover:border-purple-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+    >
+      <svg
+        class="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M15.75 19.5L8.25 12l7.5-7.5"
+        />
+      </svg>
+    </button>
+
+    <!-- Botones Dinámicos Memorizados -->
+    @for (page of pagesArray(); track page) {
+      <button
+        (click)="changePage(page)"
+        [class.border-purple-500]="currentPage() === page"
+        [class.bg-purple-500]="currentPage() === page"
+        [class.white]="currentPage() === page"
+        [class.shadow-\[0_0_10px_rgba\(139\,92\,246\,0.15\)\]]="
+          currentPage() === page
+        "
+        [class.font-bold]="currentPage() === page"
+        [class.border-zinc-900]="currentPage() !== page"
+        [class.bg-zinc-950]="currentPage() !== page"
+        [class.text-zinc-500]="currentPage() !== page"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border text-xs transition-all font-mono"
+      >
+        {{ page }}
+      </button>
+    }
+
+    <!-- Siguiente -->
+    <button
+      (click)="next()"
+      [disabled]="currentPage() === totalPages()"
+      class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-900 bg-zinc-950 text-zinc-400 hover:text-purple-400 hover:border-purple-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+    >
+      <svg
+        class="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M8.25 4.5l7.5 7.5-7.5 7.5"
+        />
+      </svg>
+    </button>
+  </div>
+</div>

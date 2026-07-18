@@ -1,0 +1,160 @@
+<div class="space-y-8 animate-fade-in">
+  <!-- Breadcrumbs & Nuevo usuario -->
+  <app-page-header
+    title="Control de Usuarios"
+    description="Gestiona los accesos, roles y lecturas activas del ecosistema."
+    [routeNewData]="routeNewUser"
+  />
+
+  <!-- Buscador y Filtros -->
+  <app-users-filters
+    [(searchTerm)]="searchTerm"
+    [roles]="roles()"
+    [(selectedRole)]="selectedRole"
+    [status]="status()"
+    [(selectedStatus)]="selectedStatus"
+    (resetFilters)="resetFilters()"
+  />
+
+  <!-- Tabla de Usuarios -->
+  <app-table
+    [data]="users()"
+    [loading]="isLoading()"
+    [columns]="tableColumns"
+    entity="Usuarios"
+    [page]="page()"
+    [limit]="limit()"
+    [totalItems]="totalItems()"
+    [totalPages]="totalPages()"
+    (pageChanged)="page.set($event)"
+  >
+    <!-- Usuario -->
+    <ng-template appCellDef="user" let-user>
+      <div class="flex items-center gap-3">
+        <div
+          class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/20 text-sm font-bold text-purple-400 font-mono"
+        >
+          {{ user.name.substring(0, 1) }}{{ user.lastname.substring(0, 1) }}
+        </div>
+        <div>
+          <div
+            class="font-medium text-zinc-200 group-hover:text-white transition-colors"
+          >
+            {{ user.name }} {{ user.lastname }}
+          </div>
+          <div class="text-xs text-zinc-500 font-mono">
+            {{ user.email }}
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Role -->
+    <ng-template appCellDef="role" let-user>
+      <span
+        [ngClass]="{
+          'text-purple-400 bg-purple-500/10 border-purple-500/20':
+            user.role === 'ADMIN',
+          'text-zinc-400 bg-zinc-800/30 border-zinc-700/30':
+            user.role === 'USER',
+        }"
+        class="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase"
+      >
+        {{ user.role }}
+      </span>
+    </ng-template>
+
+    <!-- Libros -->
+    <ng-template appCellDef="booksCount" let-user>
+      <div class="flex items-center gap-1.5">
+        <svg
+          class="h-3.5 w-3.5 text-purple-500/70"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+          />
+        </svg>
+        <span>{{ user.quantityBooks }}</span>
+      </div>
+    </ng-template>
+
+    <!-- Estado -->
+    <ng-template appCellDef="isActive" let-user>
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-2 w-2">
+          @if (user.isActive) {
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+            ></span>
+          }
+          <span
+            [ngClass]="user.isActive ? 'bg-emerald-500' : 'bg-zinc-700'"
+            class="relative inline-flex rounded-full h-2 w-2"
+          ></span>
+        </span>
+        <span
+          [ngClass]="user.isActive ? 'text-emerald-400' : 'text-zinc-500'"
+          class="text-xs font-medium"
+        >
+          {{ user.isActive ? "Activo" : "Inactivo" }}
+        </span>
+      </div>
+    </ng-template>
+
+    <!-- F. Creación -->
+    <ng-template appCellDef="createdAt" let-user>
+      <span class="text-xs text-zinc-500 font-mono">
+        {{ user.createdAt }}
+      </span>
+    </ng-template>
+
+    <!-- Acciones -->
+    <ng-template appActionsDef let-user>
+      <!-- Botón Editar -->
+      <div
+        (click)="editUser(user)"
+        class="p-1.5 text-zinc-500 hover:text-purple-400 hover:bg-purple-500/5 rounded-lg transition-all cursor-pointer"
+      >
+        <svg
+          class="h-4.5 w-4.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+          />
+        </svg>
+      </div>
+
+      <!-- Botón Eliminar -->
+      <div
+        (click)="deleteUser(user)"
+        class="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition-all cursor-pointer"
+      >
+        <svg
+          class="h-4.5 w-4.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+          />
+        </svg>
+      </div>
+    </ng-template>
+  </app-table>
+</div>

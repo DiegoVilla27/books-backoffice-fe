@@ -1,0 +1,183 @@
+<div class="w-full space-y-8 animate-fade-in">
+  <!-- Breadcrumbs & Encabezado
+  <app-breadcrumbs
+    [breadcrumbs]="breadcrumbs"
+    [title]="isEditMode() ? 'Editar usuario' : 'Nuevo usuario'"
+    [description]="
+      isEditMode()
+        ? 'Actualiza la información de perfil, privilegios y estado de este usuario.'
+        : 'Crea una nueva cuenta de acceso para el directorio.'
+    "
+  /> -->
+
+  @if (isInitialLoading()) {
+    <div
+      class="flex h-64 items-center justify-center text-zinc-500 font-mono text-xs"
+    >
+      Cargando perfil de usuario...
+    </div>
+  } @else {
+    <!-- Formulario Principal -->
+    <form
+      [formGroup]="userForm"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      autocomplete="off"
+      class="rounded-2xl border border-zinc-900 bg-zinc-950/40 p-6 md:p-8 backdrop-blur-md space-y-6 mt-8"
+    >
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <!-- Input CVA: Nombre -->
+        <app-input
+          formControlName="name"
+          label="Nombre"
+          placeholder="ej: Diego"
+          [parentForm]="userForm"
+          [errorsMap]="validations"
+          controlName="name"
+        ></app-input>
+
+        <!-- Input CVA: Apellido -->
+        <app-input
+          formControlName="lastname"
+          label="Apellido"
+          placeholder="ej: Villa"
+          [parentForm]="userForm"
+          [errorsMap]="validations"
+          controlName="lastname"
+        ></app-input>
+
+        <!-- Input CVA: Email -->
+        <div>
+          <app-input
+            formControlName="email"
+            type="email"
+            label="Correo Electrónico"
+            placeholder="ej: diego@cabuweb.com"
+            [parentForm]="userForm"
+            [errorsMap]="validations"
+            controlName="email"
+            (blur)="onEmailBlur()"
+          ></app-input>
+
+          @if (loadingEmail()) {
+            <span class="animate-pulse text-purple-400 font-mono text-xs"
+              >Verificando disponibilidad...</span
+            >
+          }
+        </div>
+
+        <!-- Input CVA: Password -->
+        <app-input
+          formControlName="password"
+          type="password"
+          [label]="isEditMode() ? 'Nueva Contraseña' : 'Contraseña'"
+          placeholder="ej: xxxxxxx"
+          [parentForm]="userForm"
+          [errorsMap]="validations"
+          controlName="password"
+        ></app-input>
+
+        <!-- Input CVA: Edad -->
+        <app-input
+          formControlName="age"
+          type="number"
+          label="Edad"
+          placeholder="ej: 25"
+          [parentForm]="userForm"
+          [errorsMap]="validations"
+          controlName="age"
+        ></app-input>
+
+        <!-- Select CVA: Rol -->
+        <app-select
+          formControlName="role"
+          label="Rol de Sistema"
+          [options]="roleOptions"
+          [parentForm]="userForm"
+          [errorsMap]="validations"
+          controlName="role"
+        ></app-select>
+
+        <!-- Switch de Estado (Sutil interruptor en morado) -->
+        <div
+          class="md:col-span-2 border-t border-zinc-900/60 pt-6 flex items-center justify-between"
+        >
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-200">
+              Estado de Cuenta
+            </h3>
+            <p class="text-xs text-zinc-500">
+              Los usuarios inactivos no podrán acceder al sistema.
+            </p>
+          </div>
+
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="isActive"
+              class="sr-only peer"
+            />
+            <div
+              class="w-11 h-6 bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500 peer-checked:after:bg-white"
+            ></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Botonera del Formulario -->
+      <div
+        class="flex items-center justify-end gap-3 border-t border-zinc-900/60 pt-6"
+      >
+        <button
+          type="button"
+          [routerLink]="routeUsers"
+          class="px-5 py-2.5 rounded-xl border border-zinc-900 text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/40 transition-all"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting()"
+          class="relative group overflow-hidden rounded-xl bg-purple-500 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-purple-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          ></div>
+          <span class="relative flex items-center justify-center gap-2">
+            <!-- Spinner de carga -->
+            @if (isSubmitting()) {
+              <svg
+                class="animate-spin h-4 w-4 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            }
+
+            {{
+              isSubmitting()
+                ? "Guardando..."
+                : isEditMode()
+                  ? "Guardar Cambios"
+                  : "Crear Usuario"
+            }}
+          </span>
+        </button>
+      </div>
+    </form>
+  }
+</div>
