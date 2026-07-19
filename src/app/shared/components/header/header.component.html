@@ -3,7 +3,17 @@
 >
   <div class="mx-auto flex h-16 w-full items-center justify-between px-6">
     <!-- Lado Izquierdo: Branding Minimalista -->
-    <div class="flex items-center gap-8">
+    <div class="flex items-center gap-4 md:gap-8">
+      <!-- Botón de Menú Móvil -->
+      <button
+        (click)="toggleMenu.emit()"
+        class="flex md:hidden p-2 text-zinc-400 hover:text-purple-400 hover:bg-zinc-900 rounded-lg transition-all duration-200"
+      >
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       <a routerLink="/dashboard" class="flex items-center gap-2.5 group">
         <!-- Isotipo: Un hexágono o detalle geométrico en Purple 500 con brillo sutil -->
         <div

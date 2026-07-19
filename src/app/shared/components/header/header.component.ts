@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@modules/auth/services/auth.service';
 
@@ -18,6 +18,8 @@ import { AuthService } from '@modules/auth/services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
+  /** Event emitted when mobile toggle button is clicked. */
+  readonly toggleMenu = output<void>();
 
   /** Temporary image used as placeholder avatar for layout mockups. */
   avatarTemp: string = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { menuItems, NavItem } from './data';
 
@@ -14,6 +14,9 @@ import { menuItems, NavItem } from './data';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AsideComponent {
+  /** Responsive drawer toggle parameter passed by ancestor layouts. */
+  isOpenMobile = input<boolean>(false);
+
   /** Visual state tracker flag representing if sidebar is collapsed or expanded. */
   isCollapsed = signal<boolean>(false);
 

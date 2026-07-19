@@ -1,15 +1,17 @@
 <aside
   [class.w-64]="!isCollapsed()"
   [class.w-20]="isCollapsed()"
-  class="hidden md:flex flex-col h-[calc(100vh-4rem)] sticky top-16 left-0 bg-zinc-950 border-r border-zinc-900 transition-all duration-300 ease-in-out z-40"
+  [class.translate-x-0]="isOpenMobile()"
+  [class.-translate-x-full]="!isOpenMobile()"
+  class="fixed md:sticky top-16 left-0 h-[calc(100vh-4rem)] z-40 md:z-auto transition-transform duration-300 md:translate-x-0 flex flex-col bg-zinc-950 border-r border-zinc-900 ease-in-out"
 >
   <!-- Encabezado de la barra lateral: Acción de Colapsar -->
   <div
-    class="flex items-center justify-end px-4 py-3 border-b border-zinc-900/60"
+    class="items-center justify-end px-4 py-3 border-b border-zinc-900/60 hidden md:flex"
   >
     <button
       (click)="toggleSidebar()"
-      class="p-1.5 rounded-lg border border-zinc-800/80 bg-zinc-900/30 text-zinc-400 hover:text-purple-400 hover:border-purple-500/20 transition-all duration-200"
+      class="p-1.5 rounded-lg border border-zinc-800/80 bg-zinc-900/30 text-zinc-400 hover:text-purple-400 hover:border-purple-500/20 transition-all duration-200 cursor-pointer"
     >
       <!-- Icono Chevron Left / Right -->
       <svg

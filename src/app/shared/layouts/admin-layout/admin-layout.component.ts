@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from '@shared/components/header/header.component';
 import { AsideComponent } from '@shared/components/aside/aside.component';
 import { FooterComponent } from '@shared/components/footer/footer.component';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-devtools.component';
+import { filter } from 'rxjs';
 
 /**
  * Core structural layout wrapper for the protected administrative application domain.
@@ -33,13 +34,21 @@ import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-
     <div class="flex flex-col h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100 selection:bg-purple-500/30 selection:text-purple-200">
       
       <!-- Header Fijo Superior -->
-      <app-header class="shrink-0"></app-header>
+      <app-header (toggleMenu)="isMobileMenuOpen.set(!isMobileMenuOpen())" class="shrink-0"></app-header>
       
       <!-- Contenedor del espacio de trabajo -->
-      <div class="flex flex-1 h-[calc(100vh-64px)] overflow-hidden">
+      <div class="flex flex-1 h-[calc(100vh-64px)] overflow-hidden relative">
         
+        <!-- Backdrop del menú móvil -->
+        @if (isMobileMenuOpen()) {
+          <div 
+            (click)="isMobileMenuOpen.set(false)" 
+            class="fixed inset-0 z-30 bg-zinc-950/60 backdrop-blur-sm md:hidden animate-fade-in"
+          ></div>
+        }
+
         <!-- Sidebar Fijo -->
-        <app-aside class="shrink-0 h-full border-r border-zinc-900 bg-zinc-950/50"></app-aside>
+        <app-aside [isOpenMobile]="isMobileMenuOpen()" class="shrink-0 h-full border-r border-zinc-900 bg-zinc-950/50"></app-aside>
         
         <!-- Columna de Contenido Principal + Footer -->
         <div class="flex flex-col flex-1 h-full overflow-hidden">
@@ -62,9 +71,24 @@ import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminLayoutComponent {
+  /** Responsive mobile sidebar visibility toggle state. */
+  readonly isMobileMenuOpen = signal<boolean>(false);
+
+  /** Injected Angular Router utility managing navigation. */
+  private readonly router = inject(Router);
+
   /**
    * Injected tracking system service managing hierarchical breadcrumb mutations.
    * Feeds historical segments into the template view context reactively.
    */
   readonly breadcrumbSvc = inject(BreadcrumbService);
+
+  constructor() {
+    // Cerrar automáticamente el menú móvil al navegar a una nueva ruta
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.isMobileMenuOpen.set(false);
+    });
+  }
 }
