@@ -16,6 +16,10 @@ export const CACHE_TIMES = {
  * Standardized namespace keys used to organize cache stores.
  */
 export const KEY_QUERIES = {
+  /** Dashboard statistics queries. */
+  STATS: 'stats',
+  /** Dashboard history queries. */
+  HISTORY: 'history',
   /** User profile collection queries. */
   USERS: 'users',
   /** General user selection directory references. */

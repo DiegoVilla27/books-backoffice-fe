@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
+import { cacheHttp, KEY_QUERIES } from '@core/cache';
 import { ToastService } from '@core/services/toast.service';
 import { environment } from '@env/environment';
 import { finalize } from 'rxjs';
@@ -56,12 +57,14 @@ export class DashboardService {
    * @returns Observable<DashboardStats> that will emit the aggregated dashboard statistics.
    */
   getStats(): void {
-    this.http.get<DashboardStats>(`${this.API_URL}/stats`)
+    const request$ = this.http.get<DashboardStats>(`${this.API_URL}/stats`);
+
+    cacheHttp([KEY_QUERIES.STATS], request$)
       .pipe(finalize(() => this._loadingStats.set(false)))
       .subscribe({
-        next: (stats) => this._stats.set(stats),
+        next: (stats) => Promise.resolve().then(() => this._stats.set(stats)),
         error: (err) => this.toastSvc.error(err.error.message)
-      });
+      });;
   }
 
   /**
@@ -73,10 +76,12 @@ export class DashboardService {
    * @returns Observable<DashboardHistory[]> that will emit the historical data organized by month.
    */
   getHistory(year: number): void {
-    this.http.get<DashboardHistory[]>(`${this.API_URL}/history`, { params: { year } })
+    const request$ = this.http.get<DashboardHistory[]>(`${this.API_URL}/history`, { params: { year } });
+
+    cacheHttp([KEY_QUERIES.HISTORY, year], request$)
       .pipe(finalize(() => this._loadingHistory.set(false)))
       .subscribe({
-        next: (history) => this._history.set(history),
+        next: (history) => Promise.resolve().then(() => this._history.set(history)),
         error: (err) => this.toastSvc.error(err.error.message)
       });
   }
