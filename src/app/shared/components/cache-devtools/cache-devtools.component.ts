@@ -1,38 +1,38 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, NgZone, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, NgZone, OnDestroy, signal } from '@angular/core';
 import { clearCache, getCacheSnapshot, invalidateCache } from '@core/cache';
 
 /**
  * Debugging developer overlay console displaying active runtime query cache entries.
+ * Decouples background polling behaviors by managing state synchronization under demand.
  *
  * @remarks
- * Uses zone-coalescing loops running outside the standard Angular zone context.
- * Periodically polls the global cache map, waking the Angular change detector
- * only when changes are detected or the dashboard overlay is active.
+ * Optimizes CPU utilization profiles by executing iterative polling loops outside the standard
+ * Angular execution zone exclusively while the diagnostic dashboard viewport overlay remains active.
  */
 @Component({
   selector: 'app-cache-devtools',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed bottom-4 left-4 z-50 font-mono text-xs">
+    <div class="fixed bottom-4 left-4 z-50 font-mono text-xs mr-4">
       <!-- Botón flotante para abrir/cerrar -->
       <button 
-        (click)="isOpen.set(!isOpen())"
+        (click)="togglePanel()"
         class="bg-purple-600 hover:bg-purple-700 text-zinc-100 px-4 py-2 rounded-xl shadow-2xl font-semibold tracking-wide border border-purple-500/30 transition-all active:scale-95"
       >
-        {{ isOpen() ? '✕ Cerrar DevTools' : '⚡ Cache DevTools (' + cacheSize() + ')' }}
+        {{ isOpen() ? '✕ Cerrar DevTools' : '⚡ Cache DevTools' }}
       </button>
 
       <!-- Panel Principal -->
       @if (isOpen()) {
-        <div class="w-[550px] max-h-[500px] bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl mt-3 flex flex-col overflow-hidden backdrop-blur-md bg-opacity-95">
+        <div class="w-full md:w-[550px] max-h-[500px] bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl mt-3 flex flex-col overflow-hidden backdrop-blur-md bg-opacity-95">
           
           <!-- Encabezado -->
-          <div class="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-            <h3 class="text-zinc-200 font-bold tracking-tight text-sm flex items-center gap-2">
+          <div class="p-4 border-b border-zinc-800 flex justify-between items-start bg-zinc-900/50 flex-col md:flex-row md:items-center gap-2 md:gap-0">
+            <h3 class="text-zinc-200 font-bold tracking-tight text-xs md:text-sm flex items-center gap-2">
               <span class="h-2 w-2 rounded-full bg-purple-500 animate-pulse"></span>
-              Estado del Almacenamiento (Caché)
+              Estado del Almacenamiento Caché | Entradas: {{ cacheSize() }}
             </h3>
             <button 
               (click)="onClearAll()"
@@ -41,7 +41,7 @@ import { clearCache, getCacheSnapshot, invalidateCache } from '@core/cache';
               Vaciar Caché
             </button>
           </div>
-
+          
           <!-- Listado de Consultas -->
           <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
             @if (cacheEntries().length === 0) {
@@ -100,114 +100,142 @@ import { clearCache, getCacheSnapshot, invalidateCache } from '@core/cache';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CacheDevToolsComponent implements OnInit, OnDestroy {
+export class CacheDevToolsComponent implements OnDestroy {
   /** Active visibility state of the floating developer overlay console. */
   isOpen = signal<boolean>(false);
   /** Dynamic lists of active caching keys and states. */
   cacheEntries = signal<any[]>([]);
   /** Size count of stored cache keys. */
   cacheSize = signal<number>(0);
-  /** Captured interval ID reference. */
-  private intervalId: any;
 
-  /** Injected Angular NgZone helper utility. */
+  /** Captured background interval ID reference identifier. */
+  private intervalId: any = null;
+  /** Injected Angular NgZone execution bridge context. */
   private ngZone = inject(NgZone);
 
+  constructor() {
+    // Inicialización pasiva del tamaño base de la caché sin abrir temporizadores
+    this.cacheSize.set(getCacheSnapshot().length);
+  }
+
   /**
-   * Initializes the polling loops running outside of Angular to safeguard performance.
+   * Orchestrates panel state visibility mutations and safely hooks on-demand polling tasks.
    */
-  ngOnInit(): void {
-    let ultimoTamanoConocido = 0;
+  togglePanel(): void {
+    const nextState = !this.isOpen();
+    this.isOpen.set(nextState);
+
+    if (nextState) {
+      this.startPolling();
+    } else {
+      this.stopPolling();
+      this.cacheSize.set(getCacheSnapshot().length); // Actualización estática final
+    }
+  }
+
+  /**
+   * Spawns core telemetry collection loop parameters outside Angular run boundaries.
+   */
+  private startPolling(): void {
+    this.stopPolling(); // Cortafuegos: previene la duplicación accidental de hilos
+    this.updateSnapshot(); // Sincronización síncrona inmediata previa al delay de 1s
 
     this.ngZone.runOutsideAngular(() => {
       this.intervalId = setInterval(() => {
-        // 1. Tomamos la foto de la caché en segundo plano (0% uso de Angular)
-        const snapshot = getCacheSnapshot();
-        const tamanoActual = snapshot.length;
-
-        // 2. ¿Vale la pena despertar a Angular? 
-        // SÓLO lo despertamos si las DevTools están abiertas (para ver los JSONs)
-        // O si entró/salió una petición nueva (para actualizar el contador del botón)
-        const panelAbierto = this.isOpen();
-        const huboCambios = tamanoActual !== ultimoTamanoConocido;
-
-        if (panelAbierto || huboCambios) {
-          // Guardamos el tamaño para la siguiente iteración
-          ultimoTamanoConocido = tamanoActual;
-
-          // 🚀 Despertamos a Angular con precisión quirúrgica
-          this.ngZone.run(() => {
-            this.cacheEntries.set(snapshot);
-            this.cacheSize.set(tamanoActual);
-          });
-        }
+        this.updateSnapshot();
       }, 1000);
     });
   }
 
   /**
-   * Dismisses polling loop timers.
+   * Re-enters Angular zones selectively to dispatch UI signal tracking metrics updates.
    */
-  ngOnDestroy(): void {
-    if (this.intervalId) clearInterval(this.intervalId);
+  private updateSnapshot(): void {
+    const snapshot = getCacheSnapshot();
+
+    this.ngZone.run(() => {
+      this.cacheEntries.set(snapshot);
+      this.cacheSize.set(snapshot.length);
+    });
   }
 
   /**
-   * Deactivates cache items matching the targeted keys.
+   * Dismisses and garbage-collects current internal timers from operational hardware pools.
+   */
+  private stopPolling(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  /**
+   * Lifecycle cleanup hook enforcing asynchronous process teardowns.
+   */
+  ngOnDestroy(): void {
+    this.stopPolling();
+  }
+
+  /**
+   * Deactivates cache items matching the targeted unique key selector namespace.
    *
-   * @param key - Target namespace string.
+   * @param key - Target query lookup criteria key.
    */
   onInvalidate(key: string): void {
     invalidateCache([key]);
-    this.cacheEntries.set(getCacheSnapshot());
+    this.updateSnapshot();
   }
 
   /**
-   * Resets all stored cache items.
+   * Resets all globally active cache store map structures.
    */
   onClearAll(): void {
     clearCache();
     this.cacheEntries.set([]);
+    this.cacheSize.set(0);
   }
 
   /**
-   * Computes age delta seconds of a cache timestamp.
+   * Computes age delta seconds matching a dynamic millisecond epoch record.
    *
-   * @param timestamp - Numeric epoch millisecond stamp.
-   * @returns Unwrapped decimal representation string.
+   * @param timestamp - Stored database creation epoch timestamp.
+   * @returns Trimmed string representation of parsed time differences.
    */
   getAge(timestamp: number): string {
-    return ((Date.now() - timestamp) / 1000).toFixed(1);
+    return ((Date.now() - timestamp) / 1000).toFixed(0);
   }
 
   /**
-   * Prettifies JSON objects by wrapping target data properties in styled spans.
+   * Prettifies standard object shapes by wrapping token matches in utility Tailwind CSS spans.
    *
-   * @param json - Raw object data configuration parameters.
-   * @returns Styled and escaped HTML string template representation.
+   * @param json - Target structural node criteria input payload data.
+   * @returns Raw template string containing parsed code style parameters.
    */
   syntaxHighlight(json: any): string {
     if (!json) return 'null';
-    if (typeof json !== 'object') json = JSON.parse(json);
+    if (typeof json !== 'object') {
+      try {
+        json = JSON.parse(json);
+      } catch {
+        return String(json);
+      }
+    }
 
     let str = JSON.stringify(json, null, 2);
-
-    // Escapar caracteres HTML básicos
     str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    // Expresión regular para colorear propiedades, strings, números y booleanos en el JSON
     return str.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, (match) => {
-      let cls = 'text-amber-500'; // Por defecto: Números
+      let cls = 'text-amber-500'; // Números
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = 'text-zinc-500 font-medium'; // Propiedades (Keys)
+          cls = 'text-zinc-500 font-medium'; // Llaves (Keys)
         } else {
-          cls = 'text-teal-400'; // Cadenas de texto (Strings)
+          cls = 'text-teal-400'; // Strings
         }
       } else if (/true|false/.test(match)) {
         cls = 'text-purple-400 font-bold'; // Booleanos
       } else if (/null/.test(match)) {
-        cls = 'text-red-400 italic'; // Nulos (Nulls)
+        cls = 'text-red-400 italic'; // Nulos
       }
       return `<span class="${cls}">${match}</span>`;
     });
