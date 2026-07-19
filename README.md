@@ -29,9 +29,13 @@ The system addresses critical administrative pain points: it ensures secure JWT 
 |  🔑  | **Reactive Authentication**  | State-guaranteed user sign-up and sign-in pipelines secured with role-based route access controls.          |
 |  📚  | **Unified Books CRUD**       | Complete directory management including creation, modification, categorization, and deletion of records.    |
 |  👥  | **User Directory Panel**     | User entity cataloguing and privilege assignment layout structures.                                         |
-|  🛡️  | **Silent Token Refresh**     | Zero-downtime session persistence via an automated background token rotation protocol.                      |
+|  🛡️  | **Silent Token Refresh**     | Zero-downtime session persistence via an automated background token rotation protocol with concurrent queueing. |
 |  🔄  | **Reactive Filter Pipeline** | Streamlined data fetching binding Signals and RxJS to auto-reset pages and refresh data on mutation events. |
-|  📱  | **Responsive Adaptive Grid** | Multi-device layout featuring a collapsible layout drawer for optimized viewports.                          |
+|  📱  | **Responsive Aside Drawer**  | Touch-friendly hamburger triggers and overlay backdrops resolving administrative controls on small screens.  |
+|  🧭  | **Wildcard Route (404)**     | Dedicated client-side NotFound page with historical back-tracking to preserve user state flow.              |
+|  💾  | **Unsaved Changes Guard**    | `FormEditableGuard` dynamically intercepts navigation when a form is dirty to prevent accidental data loss.  |
+|  📊  | **Telemetry Grouped Charts** | Custom bar charts mapping operational records securely with load masks, zero-state handlers, and legends.    |
+|  🎭  | **Route Fade-In Transitions**| Premium router layout animations standardizing visual transitions during page routing.                      |
 
 ---
 
@@ -102,18 +106,20 @@ books-fe/
 └── src/                      # Source code root
     ├── app/                  # Main application container
     │   ├── core/             # Global Singletons & Infrastructure Level Code
-    │   │   ├── guards/       # Route protection services (auth.guard.ts, public.guard.ts)
-    │   │   ├── interceptors/ # Request/Response transforms (jwt.interceptor.ts)
+    │   │   ├── animations/   # Route transition animations declarations
+    │   │   ├── guards/       # Route protection guards (auth.guard, public.guard, form-editable.guard)
+    │   │   ├── interceptors/ # Request/Response transforms (jwt.interceptor.ts supporting Mutex refreshes)
     │   │   ├── interfaces/   # Shared system models (pagination.ts)
     │   │   ├── services/     # Global state and utility services (toast.service.ts)
     │   │   └── utils/        # Generic helper scripts (storage.ts, pagination.ts)
     │   ├── modules/          # High-cohesion business domain modules
     │   │   ├── auth/         # Login, register components, routing & services
     │   │   ├── books/        # Books listing, creation, and detail views
+    │   │   ├── admin/        # Administration panels (dashboard modules, telemetry services, layouts)
     │   │   └── users/        # User directory table management components
     │   ├── shared/           # Reusable UI components & layouts (Low business logic)
-    │   │   ├── components/   # Structural building blocks (aside, header, footer, ui components)
-    │   │   ├── layouts/      # Visual frameworks (main-layout.component, auth-layout.component)
+    │   │   ├── components/   # Structural elements (aside, header, footer, not-found, ui components)
+    │   │   ├── layouts/      # Visual frameworks (admin-layout.component, auth-layout.component)
     │   │   ├── directives/   # Shared Angular UI behavior extensions
     │   │   └── pipes/        # Angular data mutation & formatting pipes
     │   ├── app.component.ts  # Shell entry component
@@ -122,7 +128,7 @@ books-fe/
     ├── environments/         # Build configuration overrides (environment.ts, environment.development.ts)
     ├── index.html            # Main SPA DOM viewport
     ├── main.ts               # Application entry point & platform booster
-    └── styles.scss           # Main stylesheet importing Tailwind configuration
+    └── styles.scss           # Main stylesheet importing Tailwind configuration and custom chart styles
 ```
 
 ---
@@ -251,8 +257,10 @@ To ensure peak performance and robust operations, the codebase implements the fo
 - **Reactive State Integration & Data Refresh:** Listing data is coordinated via a `combineLatest` stream linking standard Signals (for filters) and a dedicated `BehaviorSubject` (serving as a `refresh$` trigger). When records are deleted or modified, calling `refresh$.next()` automatically recalibrates the active request stream without creating duplicate subscriptions or throwing injection context errors.
 - **Smart Filter Pagination Reset:** To avoid empty views, the application monitors filter inputs (search fields, role selectors, active status dropdowns) using merged RxJS streams. Any filter change automatically resets the active page signal back to `1` before executing requests, maintaining UI safety when filters return fewer pages than the previous query state.
 - **Custom HTTP Cache Wrapper:** Leverages a custom `cacheHttp` implementation paired with `invalidateCache()` to keep server roundtrips at a minimum. When data modifications (POST, PATCH, DELETE) succeed, the target cache namespaces (e.g. `BOOKS`, `USERS`) are purged immediately so succeeding queries receive fresh server payloads.
-- **Silent Token Renewal:** Session token handling is fully contained in a unified HTTP interceptor. If requests receive a 401 code, it performs a non-blocking JWT rotate operation behind the scenes. This ensures page-reload-free interactions and prevents user disruption during form submissions.
-- **On-Demand Route Loading:** Key modules (Auth, Books, Users) are split using Angular's native lazy loading. This significantly reduces initial bundle size and speeds up time-to-interactive (TTI).
+- **Concurrent 401 Mutex Semaphore:** Resolves multiple parallel request failures during JWT token expiration. It locks subsequent API calls using a `BehaviorSubject` token lock, renewing the token once, and resuming all queued requests simultaneously.
+- **D3/NgxCharts Layout Safety:** Defends the browser against dynamic component resolver crashes by utilizing static text values (`showDataLabel`) and dynamically hiding axis/labels during zero-metric datasets (`isHistoryAllZeros`).
+- **Mobile Aside Navigation Close:** Observes the Router's `NavigationEnd` state in `AdminLayoutComponent` to automatically collapse the mobile drawer on view switch.
+- **On-Demand Route Loading:** Key modules (Auth, Books, Users, Admin) are split using Angular's native lazy loading. This significantly reduces initial bundle size and speeds up time-to-interactive (TTI).
 - **Robust Error Catching:** Unhandled backend exceptions are intercepted by the JWT middleware, mapping error payloads automatically onto reactive user toasts. This prevents app crashes and keeps the UI responsive even during API timeouts.
 
 ---
@@ -274,6 +282,18 @@ In the latest updates, the codebase has undergone a series of robust engineering
 - **Refactoring:** Replaced all listing effects with an RxJS declarative pipeline. We bound filter Signals using `toObservable()` and merged them with a custom `BehaviorSubject` (`refresh$`) inside a `combineLatest` operator. Manual actions like deleting now call `refresh$.next()`, which triggers data refresh cleanly, safely, and without memory leaks.
 - **Problem:** Changing search filters while on page `3` resulted in empty views if the new search query returned fewer than 3 pages.
 - **Refactoring:** Implemented a unified `watchFiltersToResetPage()` pipeline in all lists, automatically resetting the page signal back to `1` when filters update.
+
+### 4. Interactive Telemetry Charts
+- **Problem:** The vertical bar charts triggered multiple SVG path errors (`Expected arc flag ('0' or '1')`) when switching between years with asynchronous updates, and threw dynamic injection errors due to Angular 18's removal of standard component factories on hover.
+- **Refactoring:** Disabled D3 shape interpolation animations (`[animations]="false"`) and activated static text values (`[showDataLabel]="true"`), resolving both issues. Added dynamic detection of empty datasets (`isHistoryAllZeros`) to hide Y-axis and zero-values for a cleaner aesthetic.
+
+### 5. Responsive Mobile Drawer Scaffold
+- **Problem:** The backoffice administrative console lacked support for small screens, hiding navigation completely and leaving mobile users locked.
+- **Refactoring:** Upgraded `AsideComponent` to react to an `@Input` signal drawer toggler (`isOpenMobile`), shifting it off-screen (`-translate-x-full`) only on mobile viewports. Introduced a blur backdrop in the main layout and hooked into the Router events to collapse the drawer automatically on view change.
+
+### 6. Router Layout Transitions
+- **Problem:** Page jumps between different backoffice directories felt instant and rough.
+- **Refactoring:** Configured global Route transitions (`routeFadeInAnimation`) in `AdminLayoutComponent` leveraging the active route url to apply a subtle, hardware-accelerated slide and fade-in on router outlet renders.
 
 ---
 
