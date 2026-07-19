@@ -13,6 +13,7 @@ import { PageHeaderComponent } from '@shared/components/ui/page-header/page-head
 import { SelectComponent, SelectOption } from '@shared/components/ui/select/select.component';
 import { Subject } from 'rxjs';
 import { userValidations } from './validations';
+import { FormEditableComponent } from '@core/interfaces/form-editable';
 
 /**
  * Controller component for both creating new and editing existing User profile records.
@@ -35,7 +36,7 @@ import { userValidations } from './validations';
   templateUrl: './save.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserSaveComponent {
+export class UserSaveComponent implements FormEditableComponent {
   /** Mode toggle flag representing if editing an existing record or creating a new one. */
   isEditMode = signal<boolean>(false);
   /** Track if initial profile payloads are resolving over the network layer. */
@@ -289,5 +290,14 @@ export class UserSaveComponent {
     }
 
     this.emailBlur$.next();
+  }
+
+  /**
+   * Evaluates whether the current component state contains unsaved or dirty data modifications.
+   *
+   * @returns True if the entity state is modified and pending commit, false otherwise.
+   */
+  isDirty(): boolean {
+    return this.userForm.dirty;
   }
 }

@@ -1,5 +1,6 @@
 // src/app/modules/books/routes/books.routes.ts
 import { Routes } from '@angular/router';
+import { formEditableGuard } from '@core/guards/form-editable.guard';
 
 /**
  * Route configurations for the Books module.
@@ -14,11 +15,13 @@ export const BOOKS_ROUTES: Routes = [
   },
   {
     path: 'new',
+    canDeactivate: [formEditableGuard],
     data: { breadcrumb: 'Nuevo libro' },
     loadComponent: () => import('../pages/save/save.component').then(m => m.BookSaveComponent)
   },
   {
     path: 'edit/:id',
+    canDeactivate: [formEditableGuard],
     data: { breadcrumb: 'Editar libro' },
     loadComponent: () => import('../pages/save/save.component').then(m => m.BookSaveComponent)
   }

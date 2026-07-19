@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { publicGuard } from '@core/guards/public.guard';
 import { authGuard } from '@core/guards/auth.guard';
+import { publicGuard } from '@core/guards/public.guard';
 
 /**
  * Root routing definitions for the Angular application.
@@ -29,6 +29,6 @@ export const ROUTES: Routes = [
   // Ruta comodín para manejar páginas no encontradas (404)
   {
     path: '**',
-    redirectTo: 'admin/dashboard'
+    loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent)
   }
 ];

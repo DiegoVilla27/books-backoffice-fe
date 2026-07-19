@@ -12,6 +12,7 @@ import { SelectComponent, SelectOption } from "@shared/components/ui/select/sele
 import { finalize } from 'rxjs';
 import { bookValidations } from './validations';
 import { PageHeaderComponent } from '@shared/components/ui/page-header/page-header.component';
+import { FormEditableComponent } from '@core/interfaces/form-editable';
 
 /**
  * Controller component for both creating new and editing existing Book records.
@@ -34,7 +35,7 @@ import { PageHeaderComponent } from '@shared/components/ui/page-header/page-head
   templateUrl: './save.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookSaveComponent implements OnInit {
+export class BookSaveComponent implements OnInit, FormEditableComponent {
   /** Mode toggle flag representing if editing an existing record or creating a new one. */
   isEditMode = signal<boolean>(false);
   /** Track if initial profile payloads are resolving over the network layer. */
@@ -141,6 +142,7 @@ export class BookSaveComponent implements OnInit {
       return;
     }
 
+    this.bookForm.markAsPristine();
     this.isSubmitting.set(true);
     const payload = this.bookForm.value;
 
@@ -194,5 +196,14 @@ export class BookSaveComponent implements OnInit {
         this.toast.error(`Error al ${this.isEditMode() ? 'actualizar' : 'crear'} el libro`);
       }
     };
+  }
+
+  /**
+   * Evaluates whether the current component state contains unsaved or dirty data modifications.
+   *
+   * @returns True if the entity state is modified and pending commit, false otherwise.
+   */
+  isDirty(): boolean {
+    return this.bookForm.dirty;
   }
 }
