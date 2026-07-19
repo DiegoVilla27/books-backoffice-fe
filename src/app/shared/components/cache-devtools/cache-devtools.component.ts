@@ -15,7 +15,7 @@ import { clearCache, getCacheSnapshot, invalidateCache } from '@core/cache';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed bottom-4 left-4 z-50 font-mono text-xs mr-4">
+    <div class="fixed bottom-4 left-4 z-50 font-mono text-xs mr-4 w-full pr-8">
       <!-- Botón flotante para abrir/cerrar -->
       <button 
         (click)="togglePanel()"
