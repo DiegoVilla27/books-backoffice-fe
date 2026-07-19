@@ -7,7 +7,7 @@ import { Routes } from '@angular/router';
 export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
-    data: { breadcrumb: '' },
+    data: { breadcrumb: 'Dashboard' },
     loadComponent: () => import('../pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
   }
 ];

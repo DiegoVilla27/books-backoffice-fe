@@ -1,73 +1,83 @@
-import { Injectable } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
-import { DashboardStats, RecentActivity } from '../interfaces';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { ToastService } from '@core/services/toast.service';
+import { environment } from '@env/environment';
+import { finalize } from 'rxjs';
+import { DashboardHistory, DashboardStats } from '../interfaces';
 
-/**
- * Service managing Dashboard statistics and events mock data.
- */
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
-  /** Mock dataset mapping metric stats. */
-  private mockStats: DashboardStats = {
-    totalUsers: 142,
-    totalBooks: 489,
-    activeLoans: 68,
-    systemHealth: 'EXCELLENT'
-  };
+  /**
+   * Signal to hold the aggregated dashboard statistics.
+   */
+  private _stats = signal<DashboardStats | null>(null);
+  /**
+   * Readonly view of the dashboard statistics signal.
+   */
+  stats = this._stats.asReadonly();
+  /**
+   * Signal to indicate whether the dashboard statistics are loading.
+   */
+  private _loadingStats = signal<boolean>(true);
+  /**
+   * Readonly view of the dashboard statistics loading state.
+   */
+  loadingStats = this._loadingStats.asReadonly();
+  /**
+   * Signal to hold the aggregated dashboard history.
+   */
+  private _history = signal<DashboardHistory[]>([]);
+  /**
+   * Readonly view of the dashboard history signal.
+   */
+  history = this._history.asReadonly();
+  /**
+   * Signal to indicate whether the dashboard history is loading.
+   */
+  private _loadingHistory = signal<boolean>(true);
+  /**
+   * Readonly view of the dashboard history loading state.
+   */
+  loadingHistory = this._loadingHistory.asReadonly();
 
-  /** Mock dataset listing recent activity events. */
-  private mockActivities: RecentActivity[] = [
-    {
-      id: 'ACT-001',
-      message: 'Diego Villa registró el libro "Angular Solutions".',
-      time: 'Hace 5 minutos',
-      type: 'BOOK'
-    },
-    {
-      id: 'ACT-002',
-      message: 'Rotación automática de Refresh Token completada.',
-      time: 'Hace 12 minutos',
-      type: 'LOG'
-    },
-    {
-      id: 'ACT-003',
-      message: 'Nuevo usuario registrado: admin@cabuweb.com por Admin.',
-      time: 'Hace 24 minutos',
-      type: 'USER'
-    },
-    {
-      id: 'ACT-004',
-      message: 'Intento fallido de eliminación física de libro ID: 45.',
-      time: 'Hace 1 hora',
-      type: 'LOG'
-    },
-    {
-      id: 'ACT-005',
-      message: 'Juan Pérez modificó el título del libro "TypeScript Essentials".',
-      time: 'Hace 2 horas',
-      type: 'BOOK'
-    }
-  ];
+  /** Injected HTTP client utility for backend API communication. */
+  private http = inject(HttpClient);
+  /** Injected Toast service utility for notification. */
+  private toastSvc = inject(ToastService);
+
+  private readonly API_URL = `${environment.apiUrl}/dashboard`;
 
   /**
-   * Retrieves summary metric stats.
-   * Simulates network latency (250ms delay).
+   * Dispatches a GET request to the backend service to retrieve the aggregated statistics.
+   * Uses NgRx Effects in conjunction with the HttpClient to perform the async operation.
    * 
-   * @returns Observable stream containing the dashboard metrics.
+   * @returns Observable<DashboardStats> that will emit the aggregated dashboard statistics.
    */
-  getStats(): Observable<DashboardStats> {
-    return of(this.mockStats).pipe(delay(250));
+  getStats(): void {
+    this.http.get<DashboardStats>(`${this.API_URL}/stats`)
+      .pipe(finalize(() => this._loadingStats.set(false)))
+      .subscribe({
+        next: (stats) => this._stats.set(stats),
+        error: (err) => this.toastSvc.error(err.error.message)
+      });
   }
 
   /**
-   * Retrieves a collection of recent system activities.
-   * Simulates network latency (250ms delay).
+   * Dispatches a GET request to the backend service to retrieve the aggregated historical data for a given year.
+   * Uses NgRx Effects in conjunction with the HttpClient to perform the async operation.
    * 
-   * @returns Observable stream containing the recent activities.
+   * @param year - The integer year for which to retrieve historical data.
+   * 
+   * @returns Observable<DashboardHistory[]> that will emit the historical data organized by month.
    */
-  getRecentActivities(): Observable<RecentActivity[]> {
-    return of(this.mockActivities).pipe(delay(250));
+  getHistory(year: number): void {
+    this.http.get<DashboardHistory[]>(`${this.API_URL}/history`, { params: { year } })
+      .pipe(finalize(() => this._loadingHistory.set(false)))
+      .subscribe({
+        next: (history) => this._history.set(history),
+        error: (err) => this.toastSvc.error(err.error.message)
+      });
   }
 }

@@ -1,78 +1,54 @@
-import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { DashboardService } from '@modules/admin/pages/dashboard/services/dashboard.service';
-import { DashboardStats, RecentActivity } from '@modules/admin/pages/dashboard/interfaces';
+import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
+import { Logs } from '@modules/admin/pages/dashboard/interfaces';
+import { StatsComponent } from './components/stats/stats.component';
+import { ChartsComponent } from './components/charts/charts.component';
 
 /**
- * Controller component for the Dashboard portal summary view.
- * Coordinates metrics loading, logs lists summary, and triggers navigation actions.
+ * @description
+ * Componente contenedor de alto nivel encargado de orquestar la vista principal de la consola de administración.
+ * 
+ * Actúa como punto de montaje centralizado para los subcomponentes de telemetría analítica (gráficos), 
+ * agregación de métricas globales (tarjetas estadísticas), listados de auditoría operativa en tiempo real 
+ * y el lanzador de accesos rápidos del sistema.
+ * 
+ * @usageNotes
+ * Se utiliza como un nodo de enrutamiento principal dentro del submódulo de administración (`admin`).
+ * Utiliza la estrategia de detección de cambios por defecto de Angular, sirviendo como agregador de UI.
  */
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  imports: [CommonModule, RouterLink, StatsComponent, ChartsComponent],
+  templateUrl: './dashboard.component.html'
 })
-export class DashboardComponent implements OnInit {
-  /** Stats metrics state structure. */
-  stats: DashboardStats | null = null;
-  /** Collection listing recent events. */
-  activities: RecentActivity[] = [];
-  /** loading indicator status flag. */
-  isLoading = true;
+export class DashboardComponent {
+  /**
+   * Colección reactiva de registros de acciones y trazas operativas auditadas más recientes
+   * en la consola del backoffice.
+   */
+  logs = signal<Logs[]>([]);
 
-  /** Injected Dashboard service provider. */
-  private dashboardSvc = inject(DashboardService);
-  /** Injected Router. */
+  /**
+   * Diccionario inmutable que contiene el mapa de rutas canónicas y endpoints de navegación 
+   * del ecosistema de la aplicación. Evita el acoplamiento a paths duros en la plantilla HTML.
+   */
+  readonly routes = ROUTES_MAPPING;
+
+  /**
+   * Utilidad de enrutamiento nativa de Angular inyectada para gestionar la navegación programática.
+   */
   private router = inject(Router);
 
   /**
-   * Initializes metrics queries on page load.
-   */
-  ngOnInit(): void {
-    this.loadData();
-  }
-
-  /**
-   * Dispatches concurrent calls to load stats and activities.
-   */
-  loadData(): void {
-    this.isLoading = true;
-
-    this.dashboardSvc.getStats().subscribe({
-      next: (stats) => {
-        this.stats = stats;
-        this.checkLoadingComplete();
-      },
-      error: () => { this.isLoading = false; }
-    });
-
-    this.dashboardSvc.getRecentActivities().subscribe({
-      next: (activities) => {
-        this.activities = activities;
-        this.checkLoadingComplete();
-      },
-      error: () => { this.isLoading = false; }
-    });
-  }
-
-  /**
-   * Private helper checking load completeness.
-   */
-  private checkLoadingComplete(): void {
-    if (this.stats !== null && this.activities.length > 0) {
-      this.isLoading = false;
-    }
-  }
-
-  /**
-   * Quick action redirection handler.
+   * Gestiona y despacha redirecciones inmediatas hacia módulos operativos específicos 
+   * a través de la interacción del operario con los disparadores del lanzador de accesos rápidos.
    * 
-   * @param path - Target route string path.
+   * @param path - La ruta absoluta mapeada hacia la cual se desea redirigir el flujo de la aplicación.
    */
   navigateQuickAction(path: string): void {
-    this.router.navigate([path]);
+    this.router.navigateByUrl(path);
   }
 }

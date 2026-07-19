@@ -1,219 +1,247 @@
-<div class="space-y-8">
-  <!-- Encabezado del Dashboard -->
-  <div>
-    <h1 class="text-2xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
-      <span class="text-purple-500 font-mono">&#62;_</span> Console Dashboard
-    </h1>
-    <p class="text-sm text-zinc-400 mt-1">
-      Resumen operativo de usuarios, catálogo de libros y auditorías en tiempo real.
-    </p>
-  </div>
+<div class="space-y-8 animate-fade-in">
+  <!-- Métrica Grid Cards -->
+  <app-stats />
 
-  <!-- Loader General -->
-  <div *ngIf="isLoading" class="min-h-[400px] flex flex-col items-center justify-center gap-3">
-    <div class="w-10 h-10 rounded-full border-2 border-purple-500/30 border-t-purple-500 animate-spin"></div>
-    <p class="text-xs font-mono text-zinc-400">Cargando métricas consolidadas...</p>
-  </div>
+  <!-- Charts -->
+  <app-charts />
 
-  <!-- Contenido Principal (Solo visible cuando finalice la carga) -->
-  <div *ngIf="!isLoading" class="space-y-8 animate-fade-in">
-    
-    <!-- Métrica Grid Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      
-      <!-- Card 1: Total Usuarios -->
-      <div class="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900/80 backdrop-blur-md flex items-center justify-between group hover:border-purple-500/20 transition-all duration-300">
-        <div>
-          <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Total Usuarios</p>
-          <h3 class="text-3xl font-bold text-zinc-100 mt-2 font-mono">{{ stats?.totalUsers }}</h3>
-          <p class="text-[10px] text-zinc-500 mt-1.5 flex items-center gap-1">
-            <span class="text-purple-400">●</span> Perfiles del ecosistema
-          </p>
-        </div>
-        <div class="p-3.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/15">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-          </svg>
-        </div>
-      </div>
+  <!-- Actividad y Accesos Rápidos -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Columna Actividad Reciente (Ocupa 2/3) -->
+    <div
+      class="lg:col-span-2 p-6 rounded-2xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-md flex flex-col justify-between"
+    >
+      <div>
+        <h2 class="text-lg font-bold text-zinc-100 font-mono">
+          Actividad Reciente
+        </h2>
+        <p class="text-xs text-zinc-500 mt-1">
+          Registros de acciones auditadas más recientes en la consola.
+        </p>
 
-      <!-- Card 2: Total Libros -->
-      <div class="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900/80 backdrop-blur-md flex items-center justify-between group hover:border-purple-500/20 transition-all duration-300">
-        <div>
-          <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Total Libros</p>
-          <h3 class="text-3xl font-bold text-zinc-100 mt-2 font-mono">{{ stats?.totalBooks }}</h3>
-          <p class="text-[10px] text-zinc-500 mt-1.5 flex items-center gap-1">
-            <span class="text-purple-400">●</span> Catálogo bibliográfico
-          </p>
-        </div>
-        <div class="p-3.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/15">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-          </svg>
-        </div>
-      </div>
-
-      <!-- Card 3: Libros Prestados -->
-      <div class="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900/80 backdrop-blur-md flex items-center justify-between group hover:border-purple-500/20 transition-all duration-300">
-        <div>
-          <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Préstamos Activos</p>
-          <h3 class="text-3xl font-bold text-zinc-100 mt-2 font-mono">{{ stats?.activeLoans }}</h3>
-          <p class="text-[10px] text-zinc-500 mt-1.5 flex items-center gap-1">
-            <span class="text-emerald-400">●</span> {{ stats!.totalBooks - stats!.activeLoans }} Libros disponibles
-          </p>
-        </div>
-        <div class="p-3.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/15">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l4.03 3.359a1.125 1.125 0 0 1 0 1.73l-4.03 3.358a1.125 1.125 0 0 1-.405.865v1.275a1.125 1.125 0 0 1-1.753.931l-4.03-2.686a1.125 1.125 0 0 1-.522-.93V9.752a1.125 1.125 0 0 1 .522-.93l4.03-2.688a1.125 1.125 0 0 1 1.753.93V3.03c0-.621.504-1.125 1.125-1.125H11.625c.621 0 1.125.504 1.125 1.125Z" />
-          </svg>
-        </div>
-      </div>
-
-      <!-- Card 4: Estado del Sistema -->
-      <div class="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900/80 backdrop-blur-md flex items-center justify-between group hover:border-purple-500/20 transition-all duration-300">
-        <div>
-          <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Salud Servidor</p>
-          <h3 class="text-xl font-bold text-emerald-400 mt-3 flex items-center gap-1.5 uppercase font-mono">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            {{ stats?.systemHealth }}
-          </h3>
-          <p class="text-[10px] text-zinc-500 mt-2 flex items-center gap-1">
-            <span>●</span> Latencia óptima de API
-          </p>
-        </div>
-        <div class="p-3.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/15">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
-          </svg>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Actividad y Accesos Rápidos -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Columna Actividad Reciente (Ocupa 2/3) -->
-      <div class="lg:col-span-2 p-6 rounded-2xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-md flex flex-col justify-between">
-        <div>
-          <h2 class="text-lg font-bold text-zinc-100 font-mono">Actividad Reciente</h2>
-          <p class="text-xs text-zinc-500 mt-1">Registros de acciones auditadas más recientes en la consola.</p>
-          
-          <div class="mt-6 space-y-4">
-            <div *ngFor="let act of activities" class="flex items-start gap-4 p-3 rounded-xl hover:bg-zinc-900/20 transition-all duration-200">
-              
+        <div class="mt-6 space-y-4">
+          @for (log of logs(); track log.id) {
+            <div
+              class="flex items-start gap-4 p-3 rounded-xl hover:bg-zinc-900/20 transition-all duration-200"
+            >
               <!-- Icono según tipo -->
-              <div [ngClass]="{
-                'bg-purple-500/10 text-purple-400 border-purple-500/10': act.type === 'BOOK',
-                'bg-blue-500/10 text-blue-400 border-blue-500/10': act.type === 'USER',
-                'bg-amber-500/10 text-amber-400 border-amber-500/10': act.type === 'LOG'
-              }" class="p-2 rounded-lg border text-sm shrink-0">
-                
-                <svg *ngIf="act.type === 'BOOK'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                </svg>
-                
-                <svg *ngIf="act.type === 'USER'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-
-                <svg *ngIf="act.type === 'LOG'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 0 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408-.621 3.276a.75.75 0 0 0 .848.879l3.276-.621a.75.75 0 0 0 .34-.18l8.284-8.284a2.25 2.25 0 0 0-3.182-3.182L10.16 14.502a.75.75 0 0 0-.18.34Z" />
-                </svg>
-
+              <div
+                [ngClass]="{
+                  'bg-purple-500/10 text-purple-400 border-purple-500/10':
+                    log.type === 'BOOK',
+                  'bg-blue-500/10 text-blue-400 border-blue-500/10':
+                    log.type === 'USER',
+                  'bg-amber-500/10 text-amber-400 border-amber-500/10':
+                    log.type === 'LOG',
+                }"
+                class="p-2 rounded-lg border text-sm shrink-0"
+              >
+                @switch (log.type) {
+                  @case ("USER") {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-4 h-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                      />
+                    </svg>
+                  }
+                  @case ("BOOK") {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-4 h-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                      />
+                    </svg>
+                  }
+                  @case ("LOG") {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-4 h-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                      />
+                    </svg>
+                  }
+                }
               </div>
 
               <!-- Contenido -->
               <div class="flex-1 min-w-0">
                 <p class="text-sm text-zinc-200 font-medium tracking-tight">
-                  {{ act.message }}
+                  {{ log.message }}
                 </p>
                 <p class="text-[10px] font-mono text-zinc-500 mt-1">
-                  {{ act.time }}
+                  {{ log.time }}
                 </p>
               </div>
-
             </div>
-          </div>
-        </div>
-
-        <div class="mt-6 pt-4 border-t border-zinc-900/60">
-          <a
-            routerLink="/logs"
-            class="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors font-mono"
-          >
-            VER LOGS COMPLETOS &rarr;
-          </a>
+          }
         </div>
       </div>
 
-      <!-- Accesos Rápidos (Ocupa 1/3) -->
-      <div class="p-6 rounded-2xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-md flex flex-col justify-between">
-        <div>
-          <h2 class="text-lg font-bold text-zinc-100 font-mono">Accesos Rápidos</h2>
-          <p class="text-xs text-zinc-500 mt-1">Lanzador directo de tareas administrativas frecuentes.</p>
-          
-          <div class="mt-6 space-y-3.5">
-            <!-- Registrar Libro -->
-            <button
-              (click)="navigateQuickAction('/books/new')"
-              class="w-full text-left p-3.5 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/70 border border-zinc-900 hover:border-purple-500/20 transition-all duration-300 flex items-center gap-3.5 group"
-            >
-              <span class="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-zinc-950 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-              </span>
-              <div>
-                <p class="text-sm font-semibold text-zinc-200 group-hover:text-purple-400 transition-colors">Registrar Libro</p>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Agregar obra al catálogo</p>
-              </div>
-            </button>
-
-            <!-- Registrar Usuario -->
-            <button
-              (click)="navigateQuickAction('/users/new')"
-              class="w-full text-left p-3.5 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/70 border border-zinc-900 hover:border-purple-500/20 transition-all duration-300 flex items-center gap-3.5 group"
-            >
-              <span class="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-zinc-950 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                </svg>
-              </span>
-              <div>
-                <p class="text-sm font-semibold text-zinc-200 group-hover:text-purple-400 transition-colors">Registrar Usuario</p>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Crear perfil con credenciales</p>
-              </div>
-            </button>
-
-            <!-- Ver Auditorías -->
-            <button
-              (click)="navigateQuickAction('/logs')"
-              class="w-full text-left p-3.5 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/70 border border-zinc-900 hover:border-purple-500/20 transition-all duration-300 flex items-center gap-3.5 group"
-            >
-              <span class="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-zinc-950 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                </svg>
-              </span>
-              <div>
-                <p class="text-sm font-semibold text-zinc-200 group-hover:text-purple-400 transition-colors">Historial de Logs</p>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Supervisar historial y filtros</p>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <div class="mt-6 pt-4 border-t border-zinc-900/60 flex items-center justify-between">
-          <p class="text-[10px] font-mono text-zinc-500 tracking-wider uppercase">Cabuweb Panel v1.0</p>
-          <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_currentColor]"></div>
-        </div>
+      <div class="mt-6 pt-4 border-t border-zinc-900/60">
+        <a
+          routerLink="/logs"
+          class="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors font-mono"
+        >
+          VER LOGS COMPLETOS &rarr;
+        </a>
       </div>
-
     </div>
 
+    <!-- Accesos Rápidos (Ocupa 1/3) -->
+    <div
+      class="p-6 rounded-2xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-md flex flex-col justify-between"
+    >
+      <div>
+        <h2 class="text-lg font-bold text-zinc-100 font-mono">
+          Accesos Rápidos
+        </h2>
+        <p class="text-xs text-zinc-500 mt-1">
+          Lanzador directo de tareas administrativas frecuentes.
+        </p>
+
+        <div class="mt-6 space-y-3.5">
+          <!-- Registrar Libro -->
+          <button
+            (click)="navigateQuickAction(routes.admin.books.new)"
+            class="w-full text-left p-3.5 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/70 border border-zinc-900 hover:border-purple-500/20 transition-all duration-300 flex items-center gap-3.5 group"
+          >
+            <span
+              class="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-zinc-950 transition-all duration-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+            </span>
+            <div>
+              <p
+                class="text-sm font-semibold text-zinc-200 group-hover:text-purple-400 transition-colors"
+              >
+                Registrar Libro
+              </p>
+              <p class="text-[10px] text-zinc-500 mt-0.5">
+                Agregar obra al catálogo
+              </p>
+            </div>
+          </button>
+
+          <!-- Registrar Usuario -->
+          <button
+            (click)="navigateQuickAction(routes.admin.users.new)"
+            class="w-full text-left p-3.5 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/70 border border-zinc-900 hover:border-purple-500/20 transition-all duration-300 flex items-center gap-3.5 group"
+          >
+            <span
+              class="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-zinc-950 transition-all duration-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"
+                />
+              </svg>
+            </span>
+            <div>
+              <p
+                class="text-sm font-semibold text-zinc-200 group-hover:text-purple-400 transition-colors"
+              >
+                Registrar Usuario
+              </p>
+              <p class="text-[10px] text-zinc-500 mt-0.5">
+                Crear perfil con credenciales
+              </p>
+            </div>
+          </button>
+
+          <!-- Ver Auditorías -->
+          <button
+            (click)="navigateQuickAction('/logs')"
+            class="w-full text-left p-3.5 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/70 border border-zinc-900 hover:border-purple-500/20 transition-all duration-300 flex items-center gap-3.5 group"
+          >
+            <span
+              class="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-zinc-950 transition-all duration-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                />
+              </svg>
+            </span>
+            <div>
+              <p
+                class="text-sm font-semibold text-zinc-200 group-hover:text-purple-400 transition-colors"
+              >
+                Historial de Logs
+              </p>
+              <p class="text-[10px] text-zinc-500 mt-0.5">
+                Supervisar historial y filtros
+              </p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="mt-6 pt-4 border-t border-zinc-900/60 flex items-center justify-between"
+      >
+        <p class="text-[10px] font-mono text-zinc-500 tracking-wider uppercase">
+          Cabuweb Panel v1.0
+        </p>
+        <div
+          class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_currentColor]"
+        ></div>
+      </div>
+    </div>
   </div>
 </div>

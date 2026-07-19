@@ -1,8 +1,9 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { ROUTES } from './app.routes';
 import { authInterceptor } from '@core/interceptors/jwt.interceptor';
+import { ROUTES } from './app.routes';
 
 /**
  * Global application configuration settings.
@@ -15,7 +16,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(ROUTES),
     provideHttpClient(
       withInterceptors([authInterceptor])
-    )
+    ),
+    provideAnimations()
   ]
 };
 

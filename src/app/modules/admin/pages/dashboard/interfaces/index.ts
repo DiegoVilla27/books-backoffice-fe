@@ -2,20 +2,39 @@
  * Interface representing dashboard metrics stats summary.
  */
 export interface DashboardStats {
-  /** Total number of users registered in the system. */
-  totalUsers: number;
   /** Total number of books in the catalog. */
   totalBooks: number;
-  /** Total number of books currently on loan. */
-  activeLoans: number;
-  /** Health check condition status: EXCELLENT, STABLE, or CRITICAL. */
-  systemHealth: 'EXCELLENT' | 'STABLE' | 'CRITICAL';
+  /** Total number of users registered in the system. */
+  totalUsers: number;
 }
 
 /**
- * Interface representing a recent dashboard activity event.
+ * Interface representing a single month's aggregated records for dashboard charts.
  */
-export interface RecentActivity {
+export interface DashboardHistory {
+  /**
+   * The month represented as a two-digit string (e.g., "01", "02", ... "12").
+   */
+  month: string;
+  /**
+   * Collection of metric records containing the name of the metric type and its aggregated value.
+   */
+  records: {
+    /**
+     * The metric type name (e.g., "Libros", "Usuarios").
+     */
+    name: string;
+    /**
+     * The aggregated numeric value for the specified metric type and month.
+     */
+    value: number;
+  }[];
+}
+
+/**
+ * Interface representing a recent dashboard activity event. TEMPORAL !!!
+ */
+export interface Logs {
   /** Unique identifier of the activity event. */
   id: string;
   /** Text content describing the action. */

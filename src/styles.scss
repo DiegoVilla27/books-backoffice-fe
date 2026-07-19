@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* 📊 NgxCharts Dark Mode Styles */
+.ngx-charts {
+  text {
+    fill: #a1a1aa !important; /* text-zinc-400 */
+  }
+  .axis-label {
+    fill: #e4e4e7 !important; /* text-zinc-200 */
+  }
+  .gridline-path {
+    stroke: #27272a !important; /* stroke-zinc-800 */
+  }
+}
