@@ -1,15 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, tap, throwError } from 'rxjs';
-
+import { Observable, catchError, switchMap, tap, throwError } from 'rxjs';
+import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
+import { StorageService } from '@core/utils/storage';
+import { environment } from '@env/environment';
 import {
   AuthResponse,
   LoginRequest,
+  MeResponse,
   RegisterRequest
 } from '../interfaces';
-import { environment } from '@env/environment';
-import { StorageService } from '@core/utils/storage';
 
 /**
  * Service managing user session states, sign-up, sign-in, and JWT lifecycle processes.
@@ -19,6 +20,11 @@ import { StorageService } from '@core/utils/storage';
   providedIn: 'root'
 })
 export class AuthService {
+
+  /** Signal holding the currently authenticated user data retrieved from local storage. */
+  private _user = signal<MeResponse | null>(StorageService.get<MeResponse>('me') || null);
+  readonly user = this._user.asReadonly();
+
   /** Injected HTTP client utility for backend API communication. */
   private http = inject(HttpClient);
   /** Injected Angular Router for location changes. */
@@ -27,6 +33,19 @@ export class AuthService {
   /** Base API endpoint loaded from active environment config. */
   private readonly API_URL = environment.apiUrl;
 
+  me(): Observable<MeResponse> {
+    return this.http.get<MeResponse>(`${this.API_URL}/me`).pipe(
+      tap(user => {
+        this._user.set(user);
+        StorageService.set('me', user);
+      }),
+      catchError(error => {
+        this.logout();
+        return throwError(() => error);
+      })
+    );
+  }
+
   /**
    * Dispatches user registration details to the endpoint server.
    * On success, initializes session authentication headers.
@@ -34,9 +53,10 @@ export class AuthService {
    * @param payload - Complete user details schema for account registration.
    * @returns Observable stream containing the validation tokens.
    */
-  register(payload: RegisterRequest): Observable<AuthResponse> {
+  register(payload: RegisterRequest): Observable<MeResponse> {
     return this.http.post<AuthResponse>(`${this.API_URL}/register`, payload).pipe(
-      tap(response => this.handleAuthentication(response))
+      tap(response => this.saveTokens(response)),
+      switchMap(() => this.me())
     );
   }
 
@@ -47,9 +67,10 @@ export class AuthService {
    * @param credentials - User authentication keys.
    * @returns Observable stream containing the validation tokens.
    */
-  login(credentials: LoginRequest): Observable<AuthResponse> {
+  login(credentials: LoginRequest): Observable<MeResponse> {
     return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
-      tap(response => this.handleAuthentication(response))
+      tap(response => this.saveTokens(response)),
+      switchMap(() => this.me())
     );
   }
 
@@ -69,7 +90,7 @@ export class AuthService {
     }
 
     return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, { refresh_token }).pipe(
-      tap(response => this.handleAuthentication(response)),
+      tap(response => this.saveTokens(response)),
       catchError(error => {
         // Si el refresco también falla, la sesión está muerta de verdad
         this.logout();
@@ -83,7 +104,7 @@ export class AuthService {
    */
   logout(): void {
     this.clearStorage();
-    this.router.navigate(['/auth/login']);
+    this.router.navigateByUrl(ROUTES_MAPPING.auth.login);
   }
 
   /**
@@ -100,7 +121,7 @@ export class AuthService {
    * 
    * @param response - Response object containing access and refresh tokens.
    */
-  private handleAuthentication(response: AuthResponse): void {
+  private saveTokens(response: AuthResponse): void {
     StorageService.set('access_token', response.access_token);
     StorageService.set('refresh_token', response.refresh_token);
   }
@@ -109,7 +130,9 @@ export class AuthService {
    * Purges session tokens from the local cache.
    */
   private clearStorage(): void {
+    this._user.set(null);
     StorageService.remove('access_token');
     StorageService.remove('refresh_token');
+    StorageService.remove('me');
   }
 }

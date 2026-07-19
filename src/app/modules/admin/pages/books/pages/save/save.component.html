@@ -1,14 +1,14 @@
 <div class="w-full mx-auto space-y-8 animate-fade-in">
-  <!-- Breadcrumbs & Encabezado
-  <app-breadcrumbs
-    [breadcrumbs]="breadcrumbs"
+  <!-- Header -->
+  <app-page-header
     [title]="isEditMode() ? 'Editar libro' : 'Nuevo libro'"
     [description]="
       isEditMode()
         ? 'Modifica los detalles de este libro del catálogo.'
         : 'Registra un nuevo ejemplar bajo tu perfil de administrador.'
     "
-  /> -->
+    [showNewButton]="false"
+  />
 
   @if (isInitialLoading()) {
     <div

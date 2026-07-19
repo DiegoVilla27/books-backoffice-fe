@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '@modules/auth/services/auth.service';
 
 /**
  * Controller component for the administration dashboard top header bar.
@@ -18,22 +19,26 @@ import { RouterLink } from '@angular/router';
 })
 export class HeaderComponent {
 
-  /** Mock user profile data representation for layout bindings. */
-  currentUser = {
-    name: 'Diego Villa',
-    role: 'Administrator',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'
-  };
+  /** Temporary image used as placeholder avatar for layout mockups. */
+  avatarTemp: string = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';
 
   /** Toggle state flag controlling visibility of the user dropdown menu overlay. */
   showUserMenu = signal<boolean>(false);
 
+  readonly authSvc = inject(AuthService);
 
   /**
    * Toggles the user profile navigation menu overlay state.
    */
   toggleUserMenu() {
     this.showUserMenu.update(state => !state);
+  }
+
+  /**
+   * Logs out the current user and redirects to the login page.
+   */
+  logout() {
+    this.authSvc.logout();
   }
 }
 

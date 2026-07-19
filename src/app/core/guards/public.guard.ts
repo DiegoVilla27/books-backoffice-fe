@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
 import { AuthService } from '@modules/auth/services/auth.service';
 
 /**
@@ -20,6 +21,6 @@ export const publicGuard: CanActivateFn = (_, __) => {
 
   // Si ya tiene sesión, lo mandamos al panel principal
   console.log('[Guard] Sesión activa detectada. Redirigiendo al panel.');
-  router.navigate(['/users']);
+  router.navigateByUrl(ROUTES_MAPPING.admin.dashboard);
   return false;
 };

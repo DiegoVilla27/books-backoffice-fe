@@ -6,6 +6,7 @@ import { InputComponent } from '@shared/components/ui/input/input.component';
 import { AuthService } from '@modules/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { registerValidations } from './validations';
+import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
 
 /**
  * Component controller for the Registration page view.
@@ -94,7 +95,7 @@ export class RegisterComponent {
         this.isSubmitting.set(false);
         console.log('¡Registo exitoso! Tokens guardados.');
         this.toast.success('Sesión iniciada correctamente');
-        this.router.navigate(['/users']); // Redirección al panel
+        this.router.navigateByUrl(ROUTES_MAPPING.admin.dashboard);
       },
       error: (err) => {
         this.isSubmitting.set(false);

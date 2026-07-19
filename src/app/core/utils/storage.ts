@@ -2,7 +2,7 @@
  * Strict typing options representing permissible storage keys.
  * Guards against spelling inaccuracies or inconsistent keys in local state lookups.
  */
-export type StorageKey = 'access_token' | 'refresh_token';
+export type StorageKey = 'access_token' | 'refresh_token' | 'me';
 
 /**
  * Static client-side utility wrapper for local storage transactions.

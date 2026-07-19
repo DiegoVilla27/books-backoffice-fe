@@ -11,6 +11,7 @@ import { InputComponent } from '@shared/components/ui/input/input.component';
 import { SelectComponent, SelectOption } from "@shared/components/ui/select/select.component";
 import { finalize } from 'rxjs';
 import { bookValidations } from './validations';
+import { PageHeaderComponent } from '@shared/components/ui/page-header/page-header.component';
 
 /**
  * Controller component for both creating new and editing existing Book records.
@@ -27,7 +28,8 @@ import { bookValidations } from './validations';
     ReactiveFormsModule,
     RouterLink,
     InputComponent,
-    SelectComponent
+    SelectComponent,
+    PageHeaderComponent
   ],
   templateUrl: './save.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,13 +49,6 @@ export class BookSaveComponent implements OnInit {
   users = signal<SelectOption[]>([]);
 
   readonly routeBooks: string = ROUTES_MAPPING.admin.books.root;
-
-  /** Breadcrumb navigation items for this form view. */
-  // breadcrumbs: BreadCrumbItem[] = [
-  //   { label: 'Dashboard', routerLink: '/' },
-  //   { label: 'Libros', routerLink: '/books' },
-  //   { label: this.isEditMode() ? 'Editar Libro' : 'Nuevo Libro', routerLink: null }
-  // ];
 
   /** Validation message mappings used in the form layout. */
   validations = bookValidations;

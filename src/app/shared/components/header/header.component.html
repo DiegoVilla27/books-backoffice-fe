@@ -63,19 +63,19 @@
             class="relative p-[1.5px] rounded-full bg-gradient-to-tr from-purple-500 to-zinc-800"
           >
             <img
-              [src]="currentUser.avatar"
-              [alt]="currentUser.name"
+              [src]="avatarTemp"
+              alt="Avatar Image"
               class="h-8 w-8 rounded-full object-cover"
             />
           </div>
           <div class="hidden sm:block text-left pr-2">
             <p class="text-xs font-medium text-zinc-200">
-              {{ currentUser.name }}
+              {{ authSvc.user()?.name }} {{ authSvc.user()?.lastname }}
             </p>
             <p
               class="text-[10px] text-zinc-500 tracking-wide font-mono uppercase"
             >
-              {{ currentUser.role }}
+              {{ authSvc.user()?.role }}
             </p>
           </div>
         </button>
@@ -89,7 +89,7 @@
             <div class="px-3 py-2 border-b border-zinc-900 mb-1">
               <p class="text-xs text-zinc-500">Sesión iniciada como</p>
               <p class="text-xs font-semibold text-zinc-300 truncate">
-                diego&#64;valkyrie.io
+                {{ authSvc.user()?.email }}
               </p>
             </div>
 
@@ -135,7 +135,8 @@
             <div class="h-px bg-zinc-900 my-1"></div>
 
             <button
-              class="flex w-full items-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-red-500/5 rounded-lg transition-colors text-left"
+              (click)="logout()"
+              class="flex w-full items-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-red-500/5 rounded-lg transition-colors text-left cursor-pointer"
             >
               <svg
                 class="h-4 w-4"

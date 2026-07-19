@@ -5,6 +5,7 @@ import { AsideComponent } from '@shared/components/aside/aside.component';
 import { FooterComponent } from '@shared/components/footer/footer.component';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
+import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-devtools.component';
 
 /**
  * Controller component for the main administrative portal layout template.
@@ -19,7 +20,8 @@ import { BreadcrumbService } from '@core/services/breadcrumb.service';
     HeaderComponent,
     AsideComponent,
     FooterComponent,
-    BreadcrumbsComponent
+    BreadcrumbsComponent,
+    CacheDevToolsComponent
   ],
   template: `
     <div class="flex flex-col h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100 selection:bg-purple-500/30 selection:text-purple-200">
@@ -48,6 +50,8 @@ import { BreadcrumbService } from '@core/services/breadcrumb.service';
 
       </div>
     </div>
+    <!-- Panel flotante de monitoreo -->
+    <app-cache-devtools />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

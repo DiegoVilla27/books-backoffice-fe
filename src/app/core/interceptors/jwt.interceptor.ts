@@ -48,7 +48,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // 2. GESTIÓN DEL FLUJO DE SESIÓN EXPIRADA (401)
-      if (error.status === 401 && !req.url.includes('/auth/login') && !isRefreshRequest) {
+      if (error.status === 401 && !req.url.includes('/login') && !isRefreshRequest) {
         return authService.refreshToken().pipe(
           switchMap((refreshRes) => {
             const retryReq = req.clone({

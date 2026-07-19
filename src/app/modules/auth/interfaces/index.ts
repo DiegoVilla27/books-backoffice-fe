@@ -1,3 +1,7 @@
+import { User } from "@modules/admin/pages/users/interfaces";
+
+export type MeResponse = Pick<User, 'id' | 'name' | 'lastname' | 'email' | 'role'>;
+
 /**
  * Interface representing a user registration payload.
  */

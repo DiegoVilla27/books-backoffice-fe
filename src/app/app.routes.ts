@@ -23,7 +23,7 @@ export const ROUTES: Routes = [
   {
     path: 'admin',
     data: { breadcrumb: 'Admin' },
-    canActivate: [authGuard],
+    canMatch: [authGuard],
     loadChildren: () => import('./modules/admin/routes/admin.routes').then(m => m.ADMIN_ROUTES)
   },
   // Ruta comodín para manejar páginas no encontradas (404)

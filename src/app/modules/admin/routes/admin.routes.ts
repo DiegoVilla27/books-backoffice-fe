@@ -1,4 +1,3 @@
-// src/app/modules/auth/routes/auth.routes.ts
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from '@shared/layouts/admin-layout/admin-layout.component';
 

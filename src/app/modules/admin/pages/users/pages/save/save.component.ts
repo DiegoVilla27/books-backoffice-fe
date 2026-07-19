@@ -9,6 +9,7 @@ import { UniqueEmailValidator } from '@core/validators/unique-email.service';
 import { CreateUserRequest, UpdateUserRequest } from '@modules/admin/pages/users/interfaces';
 import { UsersService } from '@modules/admin/pages/users/services/users.service';
 import { InputComponent } from '@shared/components/ui/input/input.component';
+import { PageHeaderComponent } from '@shared/components/ui/page-header/page-header.component';
 import { SelectComponent, SelectOption } from '@shared/components/ui/select/select.component';
 import { Subject } from 'rxjs';
 import { userValidations } from './validations';
@@ -28,7 +29,8 @@ import { userValidations } from './validations';
     ReactiveFormsModule,
     RouterLink,
     InputComponent,
-    SelectComponent
+    SelectComponent,
+    PageHeaderComponent
   ],
   templateUrl: './save.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,13 +58,6 @@ export class UserSaveComponent {
     { label: 'Usuario Estándar (USER)', value: 'USER' },
     { label: 'Administrador Global (ADMIN)', value: 'ADMIN' }
   ];
-
-  /** Breadcrumb navigation items for this form view. */
-  // breadcrumbs: BreadCrumbItem[] = [
-  //   { label: 'Dashboard', routerLink: '/' },
-  //   { label: 'Usuarios', routerLink: '/users' },
-  //   { label: this.isEditMode() ? 'Editar Usuario' : 'Nuevo Usuario', routerLink: null }
-  // ];
 
   /** Validation message mappings used in the form layout. */
   validations = userValidations;

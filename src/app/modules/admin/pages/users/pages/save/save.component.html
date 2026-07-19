@@ -1,14 +1,14 @@
 <div class="w-full space-y-8 animate-fade-in">
-  <!-- Breadcrumbs & Encabezado
-  <app-breadcrumbs
-    [breadcrumbs]="breadcrumbs"
+  <!-- Header -->
+  <app-page-header
     [title]="isEditMode() ? 'Editar usuario' : 'Nuevo usuario'"
     [description]="
       isEditMode()
         ? 'Actualiza la información de perfil, privilegios y estado de este usuario.'
         : 'Crea una nueva cuenta de acceso para el directorio.'
     "
-  /> -->
+    [showNewButton]="false"
+  />
 
   @if (isInitialLoading()) {
     <div

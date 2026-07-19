@@ -6,6 +6,7 @@ import { InputComponent } from '@shared/components/ui/input/input.component';
 import { AuthService } from '@modules/auth/services/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { loginValidations } from './validations';
+import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
 
 /**
  * Component controller for the Login credential page view.
@@ -65,11 +66,18 @@ export class LoginComponent {
     const payload = this.loginForm.value;
 
     this.authSvc.login(payload).subscribe({
-      next: (_) => {
+      next: (user) => {
         this.isSubmitting.set(false);
+
+        if (user.role !== 'ADMIN') {
+          this.toast.error('Acceso denegado. Se requieren permisos de Administrador.');
+          this.authSvc.logout();
+          return;
+        }
+
         console.log('¡Login exitoso! Tokens guardados.');
         this.toast.success('Sesión iniciada correctamente');
-        this.router.navigate(['/users']); // Redirección al panel
+        this.router.navigateByUrl(ROUTES_MAPPING.admin.dashboard);
       },
       error: (err) => {
         this.isSubmitting.set(false);
