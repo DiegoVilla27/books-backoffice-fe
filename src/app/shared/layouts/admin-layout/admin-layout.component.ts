@@ -8,9 +8,15 @@ import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-devtools.component';
 
 /**
- * Controller component for the main administrative portal layout template.
- * Structures the view layout containing the top Header, sidebar collapsible Navigation Aside,
- * Main routing content wrapper viewport, and layout Footer.
+ * Core structural layout wrapper for the protected administrative application domain.
+ * Orchestrates the application shell by assembling global scaffolding modules—including 
+ * the persistent header navigation, contextual aside drawer, reactive breadcrumb navigation paths, 
+ * independent layout scroll wrappers, and debugging monitoring diagnostics panels.
+ * 
+ * @remarks
+ * This layout boundary utilizes {@link ChangeDetectionStrategy.OnPush} to bypass routine 
+ * change-detection cycles, relying exclusively on reactive Signals state mutations and 
+ * strict input reference deltas to optimize presentation layer metrics.
  */
 @Component({
   selector: 'app-admin-layout',
@@ -56,5 +62,9 @@ import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminLayoutComponent {
+  /**
+   * Injected tracking system service managing hierarchical breadcrumb mutations.
+   * Feeds historical segments into the template view context reactively.
+   */
   readonly breadcrumbSvc = inject(BreadcrumbService);
 }

@@ -1,7 +1,26 @@
 import { PaginationRequest } from "@core/interfaces/pagination";
 
+/**
+ * Data contract representing search filters and criteria parameters for user account management queries.
+ * Extends base operational pagination tracking specifications to combine index window boundaries 
+ * with structural role mapping constraints and lifecycle status parameters.
+ */
 export interface FilterUsersRequest extends PaginationRequest {
+  /**
+   * Optional system classification level utilized to segment account records.
+   * Restricts user data grid responses strictly to profiles carrying matching organizational permissions.
+   * 
+   * - `'ADMIN'`: Access layer restricted to backoffice system operators.
+   * - `'USER'`: Access layer assigned to standard platform consumers.
+   * - `''`: Empty state placeholder matching any permission layer without constraints.
+   */
   role?: 'ADMIN' | 'USER' | '';
+
+  /**
+   * Optional operational state tracking index.
+   * Serves as an index lookup key to isolate system access behaviors.
+   * Passed as a string parameter to handle unified text inputs or specific boolean flag string equivalents from query streams.
+   */
   isActive?: string;
 }
 

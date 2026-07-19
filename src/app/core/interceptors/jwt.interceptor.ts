@@ -21,7 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = StorageService.get('access_token');
 
   let authReq = req;
-  const isRefreshRequest = req.url.includes('/auth/refresh');
+  const isRefreshRequest = req.url.includes('/refresh');
 
   if (token && !isRefreshRequest) {
     authReq = req.clone({

@@ -1,12 +1,22 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
+/**
+ * Presentation fallback component designed to render seamlessly inside tabular layouts.
+ * Provides accessible, unified feedback when empty data responses or search filters 
+ * yield an empty collection grid.
+ * 
+ * @remarks
+ * This structural row utilizes {@link ChangeDetectionStrategy.OnPush} to avoid unnecessary 
+ * change-detection cycles, rendering conditionally based on parent table evaluation criteria.
+ * It is built strictly using tabular elements (`<tr>` and `<td>`) to preserve valid HTML layout hierarchies.
+ */
 @Component({
   selector: 'app-no-results',
   standalone: true,
   imports: [],
   template: `
   <tr>
-    <td [attr.colspan]="colspan" class="px-6 py-12 text-center">
+    <td [attr.colspan]="colspan()" class="px-6 py-12 text-center">
       <div class="flex flex-col items-center justify-center gap-2">
         <svg
           class="h-8 w-8 text-zinc-600"
@@ -22,7 +32,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
           />
         </svg>
         <p class="text-sm font-medium text-zinc-400">
-          No se encontraron {{ entity }}
+          No se encontraron {{ entity() }}
         </p>
         <p class="text-xs text-zinc-600">
           Prueba ajustando el término o los filtros de búsqueda.
@@ -33,12 +43,16 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-/**
- * Presentation component displayed inside tables when no matching data rows exist.
- */
 export class NoResultsComponent {
-  /** Singular descriptive name of the entity being listed. */
-  @Input({ required: true }) entity: string = '';
-  /** The colspan quantity count required to span across the entire table row. */
-  @Input({ required: true }) colspan: number = 1;
+  /** 
+   * Reactive signal holding the descriptive noun or classification of the requested resource.
+   * Dynamically alters the fallback notification label (e.g., "usuarios", "libros").
+   */
+  entity = signal<string>('');
+
+  /** 
+   * Reactive signal controlling the total layout grid cells spanned by this placeholder wrapper.
+   * Binds directly to the standard element `colspan` attribute to match the specific container context size.
+   */
+  colspan = signal<number>(1);
 }

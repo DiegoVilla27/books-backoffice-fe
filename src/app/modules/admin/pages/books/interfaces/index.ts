@@ -1,6 +1,14 @@
 import { PaginationRequest } from "@core/interfaces/pagination";
 
+/**
+ * Data contract representing search filters and layout configuration options for collection catalog queries.
+ * Extends base cursor pagination specifications to combine index constraints with user scope limitations.
+ */
 export interface FilterBooksRequest extends PaginationRequest {
+  /**
+   * Optional unique identifier used to filter the system book catalog assets by a specific record owner.
+   * Restricts collection data grid arrays strictly to items corresponding or allocated to the given account key.
+   */
   userId?: string;
 }
 

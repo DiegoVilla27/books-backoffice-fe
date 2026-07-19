@@ -1,5 +1,16 @@
 import { User } from "@modules/admin/pages/users/interfaces";
 
+/**
+ * Client session metadata projection model.
+ * Constructs a strict subset of the primary {@link User} entity contract, stripping 
+ * sensitive core footprints (such as hash keys, credentials, or internal timestamps) 
+ * before exposing the entity profile state to the presentation framework layer.
+ * 
+ * @remarks
+ * Extracted explicitly via TypeScript's utility primitive `Pick<T, K>` to preserve 
+ * downstream typing structural synchronization with the database source models.
+ * Used heavily across {@link AuthService} state routines and route guard context resolution rules.
+ */
 export type MeResponse = Pick<User, 'id' | 'name' | 'lastname' | 'email' | 'role'>;
 
 /**
