@@ -75,7 +75,6 @@ export class LoginComponent {
           return;
         }
 
-        console.log('¡Login exitoso! Tokens guardados.');
         this.toast.success('Sesión iniciada correctamente');
         this.router.navigateByUrl(ROUTES_MAPPING.admin.dashboard);
       },

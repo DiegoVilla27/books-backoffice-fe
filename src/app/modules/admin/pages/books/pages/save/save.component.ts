@@ -136,7 +136,6 @@ export class BookSaveComponent implements OnInit {
    * Form submit handler. Orchestrates validation checks and calls create/update APIs.
    */
   onSubmit(): void {
-    console.log('in');
     if (this.bookForm.invalid) {
       this.bookForm.markAllAsTouched();
       return;

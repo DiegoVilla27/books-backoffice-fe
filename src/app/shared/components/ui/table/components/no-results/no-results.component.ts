@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 
 /**
  * Presentation fallback component designed to render seamlessly inside tabular layouts.
@@ -48,11 +48,11 @@ export class NoResultsComponent {
    * Reactive signal holding the descriptive noun or classification of the requested resource.
    * Dynamically alters the fallback notification label (e.g., "usuarios", "libros").
    */
-  entity = signal<string>('');
+  entity = input<string>('');
 
   /** 
    * Reactive signal controlling the total layout grid cells spanned by this placeholder wrapper.
    * Binds directly to the standard element `colspan` attribute to match the specific container context size.
    */
-  colspan = signal<number>(1);
+  colspan = input<number>(1);
 }

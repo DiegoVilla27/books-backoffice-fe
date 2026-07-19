@@ -20,7 +20,6 @@ export const publicGuard: CanActivateFn = (_, __) => {
   }
 
   // Si ya tiene sesión, lo mandamos al panel principal
-  console.log('[Guard] Sesión activa detectada. Redirigiendo al panel.');
   router.navigateByUrl(ROUTES_MAPPING.admin.dashboard);
   return false;
 };
