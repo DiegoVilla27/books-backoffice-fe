@@ -43,7 +43,7 @@ export interface SelectOption {
         [disabled]="disabled"
         (click)="toggleDropdown()"
         (blur)="onBlur()"
-        class="flex items-center justify-between w-full rounded-xl border py-3 px-3.5 text-sm text-left transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex items-center justify-between w-full rounded-xl border py-3 px-3.5 text-sm text-left focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
         [ngClass]="{
           'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/30': hasError(),
           'border-zinc-900 focus:border-purple-500/50 focus:ring-purple-500/50': !hasError(),

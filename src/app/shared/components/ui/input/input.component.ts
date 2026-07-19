@@ -36,7 +36,7 @@ import { map, startWith, switchMap } from 'rxjs/operators';
             'border-zinc-900 focus:border-purple-500/50 focus:ring-purple-500/50': !hasError(),
             'pr-12': type() === 'password'
           }"
-          class="w-full rounded-xl border bg-zinc-950 py-3 px-4 text-sm text-zinc-200 placeholder-zinc-700 transition-all duration-300 focus:outline-none focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full rounded-xl border bg-zinc-950 py-3 px-4 text-sm text-zinc-200 placeholder-zinc-700 focus:outline-none focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </div>
       

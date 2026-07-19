@@ -52,7 +52,7 @@ import { DashboardService } from '@modules/admin/pages/dashboard/services/dashbo
       } @else {
         <!-- CARD REAL: Total Usuarios -->
         <div
-          class="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900/80 backdrop-blur-md flex items-center justify-between group hover:border-purple-500/20 transition-all duration-300"
+          class="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900/80 backdrop-blur-md flex items-center justify-between group hover:border-purple-500/20"
         >
           <div>
             <p
@@ -132,10 +132,10 @@ import { DashboardService } from '@modules/admin/pages/dashboard/services/dashbo
             <p
               class="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono"
             >
-              Salud Servidor
+              Salud Servidores
             </p>
             <h3
-              class="text-xl font-bold text-emerald-400 mt-3 flex items-center gap-1.5 uppercase font-mono"
+              class="text-lg font-bold text-emerald-400 mt-3 flex items-center gap-1.5 uppercase font-mono"
             >
               <span class="relative flex h-2 w-2">
                 <span
@@ -145,11 +145,21 @@ import { DashboardService } from '@modules/admin/pages/dashboard/services/dashbo
                   class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
                 ></span>
               </span>
-              EXCELLENT
+              API
             </h3>
-            <p class="text-[10px] text-zinc-500 mt-2 flex items-center gap-1">
-              <span>●</span> Latencia óptima de API
-            </p>
+            <h3
+              class="text-lg font-bold text-red-400 flex items-center gap-1.5 uppercase font-mono"
+            >
+              <span class="relative flex h-2 w-2">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-2 w-2 bg-red-500"
+                ></span>
+              </span>
+              LOGS
+            </h3>
           </div>
           <div
             class="p-3.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/15"

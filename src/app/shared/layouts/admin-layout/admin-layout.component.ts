@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd, ChildrenOutletContexts } from '@angular/router';
 import { HeaderComponent } from '@shared/components/header/header.component';
 import { AsideComponent } from '@shared/components/aside/aside.component';
 import { FooterComponent } from '@shared/components/footer/footer.component';
@@ -7,6 +7,7 @@ import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcru
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { CacheDevToolsComponent } from '@shared/components/cache-devtools/cache-devtools.component';
 import { filter } from 'rxjs';
+import { routeFadeInAnimation } from '@core/animations/animation-routes';
 
 /**
  * Core structural layout wrapper for the protected administrative application domain.
@@ -30,6 +31,7 @@ import { filter } from 'rxjs';
     BreadcrumbsComponent,
     CacheDevToolsComponent
   ],
+  animations: [routeFadeInAnimation],
   template: `
     <div class="flex flex-col h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100 selection:bg-purple-500/30 selection:text-purple-200">
       
@@ -55,7 +57,7 @@ import { filter } from 'rxjs';
           <app-breadcrumbs [items]="breadcrumbSvc.breadcrumbs()" />
 
           <!-- MAIN: Scroll independiente -->
-          <main class="flex-1 overflow-y-auto p-6 md:p-8 w-full mx-auto min-h-0 scrollbar-thin scrollbar-thumb-zinc-800">
+          <main class="flex-1 overflow-y-auto p-6 md:p-8 w-full mx-auto min-h-0 scrollbar-thin scrollbar-thumb-zinc-800" [@routeAnimations]="getRouteUrl()">
             <router-outlet></router-outlet>
           </main>
           
@@ -90,5 +92,13 @@ export class AdminLayoutComponent {
     ).subscribe(() => {
       this.isMobileMenuOpen.set(false);
     });
+  }
+
+  /**
+   * Retorna la URL completa activa del navegador.
+   * Al mutar en cada navegación, garantiza el disparo del trigger del fade-in.
+   */
+  getRouteUrl(): string {
+    return this.router.url;
   }
 }
