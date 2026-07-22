@@ -1,7 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormControlStatus, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormEditableComponent } from '@core/interfaces/form-editable';
 import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
 import { ToastService } from '@core/services/toast.service';
 import { EMAIL_RFC5322_STRING } from '@core/validators/email-regex';
@@ -13,7 +14,6 @@ import { PageHeaderComponent } from '@shared/components/ui/page-header/page-head
 import { SelectComponent, SelectOption } from '@shared/components/ui/select/select.component';
 import { Subject } from 'rxjs';
 import { userValidations } from './validations';
-import { FormEditableComponent } from '@core/interfaces/form-editable';
 
 /**
  * Controller component for both creating new and editing existing User profile records.
@@ -28,7 +28,6 @@ import { FormEditableComponent } from '@core/interfaces/form-editable';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     InputComponent,
     SelectComponent,
     PageHeaderComponent
@@ -72,6 +71,8 @@ export class UserSaveComponent implements FormEditableComponent {
   private route = inject(ActivatedRoute);
   /** Angular Router reference for view transitions. */
   private router = inject(Router);
+  /** Angular Location service reference. */
+  readonly location = inject(Location);
   /** Injected Users service CRUD helper. */
   private usersSvc = inject(UsersService);
   /** Core toast notification engine. */
@@ -203,6 +204,7 @@ export class UserSaveComponent implements FormEditableComponent {
       return;
     }
 
+    this.userForm.markAsPristine();
     this.isSubmitting.set(true);
     const payload = this.userForm.value;
 
@@ -299,5 +301,12 @@ export class UserSaveComponent implements FormEditableComponent {
    */
   isDirty(): boolean {
     return this.userForm.dirty;
+  }
+
+  /**
+   * Navigates to the previous route in the browser's navigation history.
+   */
+  goBack(): void {
+    this.location.back();
   }
 }

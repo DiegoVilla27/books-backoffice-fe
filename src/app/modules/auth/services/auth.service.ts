@@ -34,7 +34,7 @@ export class AuthService {
   private readonly API_URL = environment.apiUrl;
 
   me(): Observable<MeResponse> {
-    return this.http.get<MeResponse>(`${this.API_URL}/me`).pipe(
+    return this.http.get<MeResponse>(`${this.API_URL}/users/me`).pipe(
       tap(user => {
         this._user.set(user);
         StorageService.set('me', user);

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
 import { AuthService } from '@modules/auth/services/auth.service';
 
 /**
@@ -27,7 +28,15 @@ export class HeaderComponent {
   /** Toggle state flag controlling visibility of the user dropdown menu overlay. */
   showUserMenu = signal<boolean>(false);
 
+  /** 
+   * Injects the Authentication service for user session management.
+   */
   readonly authSvc = inject(AuthService);
+
+  /** 
+   * The route for the dashboard section of the application.
+   */
+  readonly routeDashboard = ROUTES_MAPPING.admin.dashboard;
 
   /**
    * Toggles the user profile navigation menu overlay state.

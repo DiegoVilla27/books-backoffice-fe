@@ -1,18 +1,18 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormEditableComponent } from '@core/interfaces/form-editable';
 import { ROUTES_MAPPING } from '@core/interfaces/routes-mapping';
 import { ToastService } from '@core/services/toast.service';
 import { CreateBookRequest, UpdateBookRequest } from '@modules/admin/pages/books/interfaces';
 import { BooksService } from '@modules/admin/pages/books/services/books.service';
 import { UsersService } from '@modules/admin/pages/users/services/users.service';
 import { InputComponent } from '@shared/components/ui/input/input.component';
+import { PageHeaderComponent } from '@shared/components/ui/page-header/page-header.component';
 import { SelectComponent, SelectOption } from "@shared/components/ui/select/select.component";
 import { finalize } from 'rxjs';
 import { bookValidations } from './validations';
-import { PageHeaderComponent } from '@shared/components/ui/page-header/page-header.component';
-import { FormEditableComponent } from '@core/interfaces/form-editable';
 
 /**
  * Controller component for both creating new and editing existing Book records.
@@ -27,7 +27,6 @@ import { FormEditableComponent } from '@core/interfaces/form-editable';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     InputComponent,
     SelectComponent,
     PageHeaderComponent
@@ -60,6 +59,8 @@ export class BookSaveComponent implements OnInit, FormEditableComponent {
   private route = inject(ActivatedRoute);
   /** Angular Router reference for redirection. */
   private router = inject(Router);
+  /** Angular Location service reference. */
+  readonly location = inject(Location);
   /** Injected Users service CRUD helper. */
   private usersSvc = inject(UsersService);
   /** Injected Books service CRUD helper. */
@@ -205,5 +206,12 @@ export class BookSaveComponent implements OnInit, FormEditableComponent {
    */
   isDirty(): boolean {
     return this.bookForm.dirty;
+  }
+
+  /**
+   * Navigates to the previous route in the browser's navigation history.
+   */
+  goBack(): void {
+    this.location.back();
   }
 }
